@@ -8,7 +8,6 @@ import Login from '../../pages/Login/Login';
 import Register from '../../pages/Register/Register';
 import BottomNavigator from '../../components/bottombar/BottomNavigator';
 import RegisterTwo from '../../pages/Register/RegisterTwo';
-
 import {TabContextProvider, useTabMenu} from '../../contexts/TabContexts';
 import AccountSettings from '../../pages/Settings/AccountSettings';
 import UserProfile from '../../pages/User/UserProfile';
@@ -18,6 +17,7 @@ import AllTasks from '../../pages/Tasks/AllTasks';
 import EditTask from '../../pages/Tasks/EditTask';
 import IndividualMainTask from '../../pages/Tasks/IndividualMainTask';
 import SubTask from '../../pages/Tasks/SubTask';
+import PlanYourDay from '../../pages/PlanYourDay/PlanYourDay';
 const Stack = createNativeStackNavigator();
 const MainNavigator = () => {
   const Splash = ({navigation}) => {
@@ -75,6 +75,7 @@ const MainNavigator = () => {
           <Stack.Screen name="edit-task" component={EditTask} />
           <Stack.Screen name="ind-task" component={IndividualMainTask} />
           <Stack.Screen name="sub-task" component={SubTask} />
+          <Stack.Screen name="plan-your-day" component={PlanYourDay} />
 
           {/* <Stack.Screen name="forgotpassword" component={Forgot} /> */}
         </Stack.Navigator>

@@ -7,6 +7,7 @@ import {
   Modal,
   Button,
   Dimensions,
+  Alert,
 } from 'react-native';
 import axios from 'axios';
 import React, {useState, useEffect, useRef} from 'react';
@@ -45,7 +46,10 @@ const SubTask = ({navigation}) => {
   const [endTime, setEndTime] = useState(null);
   const [currentTime, setCurrentTime] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [percentageWorked, setPercentageWorked] = useState(0);
   const [title, setTitle] = useState(null);
+  const [taskStatus, setTaskStatus] = useState('working');
+  const [tasksWorking, setTasksWorking] = useState(0);
   const [startDate, setStartDate] = useState(moment());
   const [clicked, setClicked] = useState(null);
   const [subTasks, setSubTasks] = useState(null);
@@ -54,11 +58,19 @@ const SubTask = ({navigation}) => {
   const counterRef = useRef(null);
   const [timerInterval, setTimerInterval] = useState(null);
   const {task, createdBy} = router.params;
+  const [tasksWorkedNow, setTasksWorkedNow] = useState(0);
   const [taskDuration, setTaskDuration] = useState(task.duration);
+
   const [taskProgress, setTaskProgress] = useState(task.progress);
   const [timer, setTimer] = useState(
-    task.duration.hours * 3600 + task.duration.minutes * 60,
+    task.duration.hours * 3600 +
+      task.duration.minutes * 60 +
+      task.duration.seconds,
   );
+  const initialTaskDuration =
+    task.duration.hours * 3600 +
+    task.duration.minutes * 60 +
+    task.duration.seconds;
   // useEffect(() => {
   //   if (task.progress.length > 0) {
   //     setTaskProgress(taskProgress => taskProgress.push(task.progress));
@@ -101,9 +113,14 @@ const SubTask = ({navigation}) => {
     ]);
     setTimerInterval(
       setInterval(() => {
-        setTimer(timer => timer - 1);
+        if (timer > 0) {
+          setTimer(timer => timer - 1);
+        }
       }, 1000),
     );
+    console.log('timer interval', timer);
+
+    setTasksWorking(prev => prev + 1);
   };
 
   const stopTimer = () => {
@@ -117,9 +134,13 @@ const SubTask = ({navigation}) => {
           moment(taskExists.startTime),
           'seconds',
         );
+        console.log('duration worked', durationWorkedSeconds);
         const durationInSeconds =
-          taskDuration.hours * 3600 + taskDuration.minutes * 60;
+          taskDuration.hours * 3600 +
+          taskDuration.minutes * 60 +
+          taskDuration.seconds;
         const durationPending = durationInSeconds - durationWorkedSeconds;
+        console.log('duration pending', durationPending);
         setTaskDuration({
           hours:
             Math.floor(Math.floor(durationPending / 60) / 60) > 0
@@ -167,76 +188,115 @@ const SubTask = ({navigation}) => {
         });
         setTaskProgress(updatedTask);
         setCurrentWorkingTask(null);
+        setTasksWorking(prev => prev - 1);
+        setTasksWorkedNow(prev => prev + 1);
         console.log(updatedTask);
         const taskDurationUpdated = updatedTask.find(
           task => task.id == currentTime,
         ).timePending;
-        console.log(taskDurationUpdated);
+
+        const taskDurationUpdatedInSeconds =
+          updatedTask[updatedTask.length - 1].timePending.hours * 3600 +
+          updatedTask[updatedTask.length - 1].timePending.minutes * 60 +
+          updatedTask[updatedTask.length - 1].timePending.seconds;
+        const percentageWorkedUptoNow =
+          100 -
+          Math.floor(
+            (taskDurationUpdatedInSeconds * 100) / initialTaskDuration,
+          );
+        setPercentageWorked(percentageWorkedUptoNow);
+        if (percentageWorkedUptoNow >= 100) {
+          setTaskStatus('completed');
+        }
       }
     }
   };
-  console.log(taskProgress);
+  if (timer < 0) {
+    stopTimer();
+  }
   const backHandler = async () => {
+    console.log(tasksWorking);
     if (taskProgress.length > 0) {
-      Toast.show({
-        type: 'info',
-        position: 'top',
-        text1: 'Updating Task..!',
-        text2:
-          'Please wait while we update your task progress to our servers..! ',
-        visibilityTime: 4000,
-        autoHide: true,
-        topOffset: 30,
-      });
-      try {
-        const {data, status} = await axios.patch(
-          `https://dear-diary-backend.cyclic.app/api/v1/tasks/${createdBy}/main-tasks/${task.belongsTo}/sub-tasks/${task._id}`,
-          {
-            progress: taskProgress,
-            duration: taskProgress[taskProgress.length - 1].timePending,
-            status: 'working',
-          },
-        );
-        console.log(data);
-        dispatch(updateSingleSubTask(data.task));
-        if (status === 200) {
+      console.log('reached here - 1');
+      if (currentWorkingTask) {
+        console.log('reached here - 2');
+        Toast.show({
+          type: 'info',
+          position: 'top',
+          text1: 'Stopping The Timer..!',
+          text2:
+            'Stopping the timer and updating the task progress to our servers..! ',
+          visibilityTime: 4000,
+          autoHide: true,
+          topOffset: 30,
+        });
+        stopTimer();
+      }
+      if (tasksWorkedNow > 0 && tasksWorking === 0) {
+        Toast.show({
+          type: 'info',
+          position: 'top',
+          text1: 'Updating Task..!',
+          text2:
+            'Please wait while we update your task progress to our servers..! ',
+          visibilityTime: 4000,
+          autoHide: true,
+          topOffset: 30,
+        });
+        try {
+          const {data, status} = await axios.patch(
+            `https://dear-diary-backend.cyclic.app/api/v1/tasks/${createdBy}/main-tasks/${task.belongsTo}/sub-tasks/${task._id}`,
+            {
+              progress: taskProgress,
+              status: taskStatus,
+              percentageWorked: percentageWorked,
+            },
+          );
+          console.log(data);
+          dispatch(updateSingleSubTask(data.task));
+
+          if (status === 200) {
+            Toast.show({
+              type: 'success',
+              position: 'top',
+              text1: 'Task Updated',
+              text2:
+                'Your task has been updated successfully, redirecting to all tasks',
+              visibilityTime: 4000,
+              autoHide: true,
+              topOffset: 30,
+            });
+            setTimeout(() => {
+              navigation.navigate('all-tasks', {
+                name: 'user',
+              });
+            }, 4000);
+          }
+        } catch (error) {
           Toast.show({
-            type: 'success',
+            type: 'error',
             position: 'top',
-            text1: 'Task Updated',
+            text1: 'Task Updating Failed',
             text2:
-              'Your task has been updated successfully, redirecting to all tasks',
+              'Your task updating has been failed, redirecting to all tasks',
             visibilityTime: 4000,
             autoHide: true,
             topOffset: 30,
           });
+          console.log(error);
           setTimeout(() => {
             navigation.navigate('all-tasks', {
               name: 'user',
             });
           }, 4000);
         }
-      } catch (error) {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          text1: 'Task Updating Failed',
-          text2: 'Your task updating has been failed, redirecting to all tasks',
-          visibilityTime: 4000,
-          autoHide: true,
-          topOffset: 30,
-        });
-        console.log(error);
-        setTimeout(() => {
-          navigation.navigate('all-tasks', {
-            name: 'user',
-          });
-        }, 4000);
       }
     }
-    navigation.navigate('all-tasks', {
-      name: 'user',
-    });
+    if (!currentWorkingTask) {
+      navigation.navigate('all-tasks', {
+        name: 'user',
+      });
+    }
   };
   let timingsContainer;
   const toggleSubTask = (id, duration) => {
@@ -434,7 +494,7 @@ const SubTask = ({navigation}) => {
                         ' min ' +
                         task.timeWorked.seconds +
                         ' s '
-                      : ' Task in Progress '}
+                      : initialTaskDuration - timer}
                   </Text>
                   {/* <View
                     style={{
@@ -469,7 +529,9 @@ const SubTask = ({navigation}) => {
                     <StarIcon width={25} height={25} />
                     <Text>
                       {moment(task.startTime).format('hh:mm:ss A')} -{' '}
-                      {moment(task.endTime).format('hh:mm:ss A')}
+                      {task.endTime
+                        ? moment(task.endTime).format('hh:mm:ss A')
+                        : 'Task In Progress'}
                     </Text>
                   </View>
                 </View>

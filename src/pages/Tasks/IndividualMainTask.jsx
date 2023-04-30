@@ -45,12 +45,16 @@ const IndividualMainTask = ({navigation}) => {
   const [title, setTitle] = useState(null);
   const [startDate, setStartDate] = useState(moment());
   const [clicked, setClicked] = useState(null);
+  const [percentage, setPercentage] = useState(0);
   const [timer, setTimer] = useState(moment.duration(0));
   const [subTasks, setSubTasks] = useState(null);
   const dispatch = useDispatch();
   const timerRef = useRef(null);
   const countdownRef = useRef(null);
-  const fetchedSubTasks = useSelector(state => state.subtasks);
+  let fetchedSubTasks = [];
+    fetchedSubTasks = useSelector(state => state.subtasks);
+  
+
   if (startDate && endDate) {
     if (moment(startDate).isAfter(endDate)) {
       setStartDate(endDate);
@@ -59,19 +63,10 @@ const IndividualMainTask = ({navigation}) => {
   }
   const router = useRoute();
   const {task} = router.params;
-  console.log(task);
   const createdBy = task.createdBy;
-  const percentage = Math.floor(
-    (task.completedTasks.length / task.subtasks.length) * 100,
-  );
-  let color;
-  if (percentage < 50) {
-    color = colors.themeRed;
-  } else if (percentage < 80) {
-    color = colors.themeYellow;
-  } else {
-    color = colors.themeGreen;
-  }
+
+
+ 
   const showToast = (text1, text2, type) => {
     Toast.show({
       text1: text1,
@@ -106,7 +101,9 @@ const IndividualMainTask = ({navigation}) => {
         moment(time).hour() > 12
           ? moment(time).hour() - 12
           : moment(time).hour(),
-      minute: moment(time).minute(),
+      minute: moment(time).minutes(),
+      seconds: moment(time).seconds(),
+      toCalculate:time,
       fullhour: moment(time).hour(),
       ampm: moment(time).hour() > 12 ? 'PM' : 'AM',
       displayTime: moment(time).format('hh:mm A'),
@@ -159,29 +156,43 @@ const IndividualMainTask = ({navigation}) => {
     }
   };
   const handleEndConfirm = time => {
-    if (moment(time).hour() > startTime.fullhour) {
+    if (moment(time).add(1,'hour').hour() > startTime.fullhour) {
+
       const fullTime = {
         hour:
           moment(time).hour() > 12
             ? moment(time).hour() - 12
             : moment(time).hour(),
         fullhour: moment(time).hour(),
-        minute: moment(time).minute(),
+        minute: moment(time).minutes(),
+        seconds: moment(time).seconds(),
+        toCalculate:time,
         ampm: moment(time).hour() > 12 ? 'PM' : 'AM',
         displayTime: moment(time).format('hh:mm A'),
       };
+     
+      const durationInSeconds = moment(fullTime.toCalculate).diff(moment(startTime.toCalculate), 'seconds');
+      
 
-      const hours = fullTime.fullhour - startTime.fullhour;
-      const minutes = fullTime.minute - startTime.minute;
+    
+     const hours =  Math.floor(Math.floor(durationInSeconds / 60) / 60) > 0
+     ? Math.floor(Math.floor(durationInSeconds / 60) / 60)
+     : 0;
+     const minutes = Math.floor(Math.floor(durationInSeconds / 60) % 60) > 0
+     ? Math.floor(Math.floor(durationInSeconds / 60) % 60)
+     : 0;
+     const seconds = durationInSeconds % 60;
       if (hours > 0) {
         setDuration({
           hours: hours,
-          minutes: Math.ceil(minutes / 60),
+          minutes: minutes,
+          seconds: seconds,
         });
       } else {
         setDuration({
           hours: null,
           minutes: minutes,
+          seconds: seconds,
         });
       }
       setEndTime(fullTime);
@@ -189,8 +200,8 @@ const IndividualMainTask = ({navigation}) => {
         'Timer Set Successfully 🥳',
         `Set the sub task for ${
           hours > 0
-            ? hours + '  hours  ' + Math.ceil(minutes / 60) + ' minutes'
-            : minutes + ' minutes'
+            ? hours + '  hours  ' + minutes + ' minutes' +  seconds + ' seconds'
+            : minutes + ' minutes' + seconds + ' seconds'
         } every day..!`,
         'success',
       );
@@ -198,14 +209,20 @@ const IndividualMainTask = ({navigation}) => {
       showToast('Error', `End time should be less than start time`, 'error');
     }
     hideEndTimePicker();
+  
+    
   };
   const fetchSubTasks = async () => {
+    console.log('reached here-1')
     try {
       if (!fetchedSubTasks) {
+        console.log('reached here-2')
         const response = await axios.get(
           `https://dear-diary-backend.cyclic.app/api/v1/tasks/${task.createdBy}/main-tasks/${task._id}/sub-tasks`,
         );
+       
         setSubTasks(response.data.subtasks);
+      
         dispatch(addSubTasks(response.data.subtasks));
       } else {
         setSubTasks(fetchedSubTasks);
@@ -215,12 +232,19 @@ const IndividualMainTask = ({navigation}) => {
     }
   };
 
+
   useEffect(() => {
     fetchSubTasks();
-    console.log(subTasks);
+    
     setCurrentTime(moment().format('hh:mm A'));
+ 
   }, []);
-
+  if(subTasks && percentage === 0){
+    subTasks.map(task=>{
+      console.log(task.percentageWorked)
+      setPercentage(prev=>prev + task.percentageWorked);
+    });
+  }
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <ScrollView
@@ -287,7 +311,7 @@ const IndividualMainTask = ({navigation}) => {
             marginTop: '5%',
             alignItems: 'center',
             backgroundColor:
-              moment(task.deadline).diff(moment(), 'days') > 0
+              moment(task.deadline).add(1,'day').diff(moment(), 'days') >= 0
                 ? 'black'
                 : colors.themeGrey,
             borderRadius: 20,
@@ -301,12 +325,12 @@ const IndividualMainTask = ({navigation}) => {
               fontFamily: 'OpenSans-Medium',
               fontSize: 16,
               color:
-                moment(task.deadline).add(1, 'day').diff(moment(), 'days') > 0
+                moment(task.deadline).add(1, 'day').diff(moment(), 'days') >= 0
                   ? 'white'
                   : colors.themeRed,
             }}>
-            {moment(task.deadline).add(1, 'day').diff(moment(), 'days') > 0
-              ? moment(task.deadline).add(1, 'day').diff(moment(), 'days') +
+            {moment(task.deadline).add(1, 'day').diff(moment(), 'days') >= 0
+              ? moment(task.deadline).add(1, 'day').diff(moment(), 'days') == 0 ?  "Today" :  moment(task.deadline).add(1, 'day').diff(moment(), 'days') +
                 ' Days Left'
               : 'Deadline Passed'}
           </Text>
@@ -322,16 +346,16 @@ const IndividualMainTask = ({navigation}) => {
                 styles.progress,
                 {
                   backgroundColor:
-                    percentage > 0 ? colors.themeGrey : colors.themeRed,
+                  '#000',
                 },
               ]}>
               <View
                 style={[
                   styles.progressFill,
                   {
-                    shadowColor: color,
-                    width: `${percentage > 0 ? percentage : 0}%`,
-                    backgroundColor: color,
+                    shadowColor: (percentage/subTasks)* 100 > 0 ? colors.themeGrey : colors.themeRed ,
+                    width: `${(subTasks ? percentage/subTasks.length : 0)}%`,
+                    backgroundColor:   subTasks?  (percentage/subTasks.length) > 0 ? (percentage/subTasks.length) > 30 ? (percentage/subTasks.length) > 50 ?(percentage/subTasks.length) > 70 ?colors.themeGreen :colors.themeBlue  : colors.themeYellow : colors.themeGrey  : colors.themeRed : colors.themeRed,
                   },
                 ]}
               />
@@ -343,19 +367,12 @@ const IndividualMainTask = ({navigation}) => {
                   fontFamily: 'MateSC-Regular',
                   fontSize: 18,
                 }}>
-                {percentage > 0 ? percentage : 0} %
+                {subTasks ? `${percentage/subTasks.length}` : "0"} %
               </Text>
             </View>
           </View>
         </View>
 
-        <View
-          style={[
-            styles.plusContainer,
-            {
-              bottom: 60,
-            },
-          ]}>
           <TouchableOpacity
             style={styles.plus}
             onPress={() => {
@@ -364,20 +381,26 @@ const IndividualMainTask = ({navigation}) => {
             }}>
             <PlusIcon width={40} height={40} />
           </TouchableOpacity>
-        </View>
-
+   
         <ScrollView contentContainerStyle={styles.subTasksContainer}>
           {subTasks &&
-            subTasks.map(task => {
-              console.log(task);
+            subTasks.map(fetchedTask => {
+             let thisTask;
+             
+             if(fetchedTask.belongsTo == task._id){
+            
+              thisTask = fetchedTask;
+             }
+           
               let timingsContainer;
               const taskExists = taskProgress.find(task => task.id === id);
               if (taskExists) {
                 timingsContainer = true;
               }
               const toggleSubTask = (id, duration) => {
+                console.log(thisTask);
                 navigation.navigate('sub-task', {
-                  task,
+                task:thisTask,
                   createdBy,
                 });
                 // if (taskExists) {
@@ -442,9 +465,10 @@ const IndividualMainTask = ({navigation}) => {
                 //   }
                 // }
               };
-              console.log(task.duration.hours);
-
+         
+if(thisTask){
               return (
+                
                 // <Swipeable
                 //   renderRightActions={() => {
                 //     return (
@@ -464,7 +488,7 @@ const IndividualMainTask = ({navigation}) => {
                 //   key={task._id}>
                 <View style={styles.subTasks}>
                   <View style={styles.subTasksRightContainer}>
-                    <Text style={styles.subTasksText}>{task.title}</Text>
+                    <Text style={styles.subTasksText}>{thisTask.title}</Text>
                     <View
                       style={{
                         marginTop: 5,
@@ -479,42 +503,60 @@ const IndividualMainTask = ({navigation}) => {
                           fontSize: 14,
                           color: `rgba(255,255,255, 0.75)`,
                         }}>
-                        {task.duration.hours
-                          ? task.duration.hours +
+                        {thisTask.duration
+                          ? thisTask.duration.hours === null ? '0 Hours ' +  thisTask.duration.minutes +
+                          ' minutes' : thisTask.duration.hours  +
                             ' Hours ' +
-                            task.duration.minutes +
+                            thisTask.duration.minutes +
                             ' minutes'
-                          : task.duration.minutes &&
-                            task.duration.minutes + ' minutes'}{' '}
+                          : thisTask.duration &&
+                          thisTask.duration.minutes + ' minutes'}{' '}
                       </Text>
                     </View>
                     <View
                       style={{
                         marginTop: 5,
+                        width: '100%',
                         flexDirection: 'row',
                         alignItems: 'center',
-                        justifyContent: 'center',
+                        justifyContent: 'flex-start',
                         gap: 10,
                       }}>
                       <StarIcon width={25} height={25} />
                       <Text>
-                        {task.startTime
-                          ? task.startTime.displayTime
-                          : moment(task.startTime).format('hh:mm A')}{' '}
+                        {thisTask.startTime
+                          ? thisTask.startTime.displayTime
+                          : moment(thisTask.startTime).format('hh:mm A')}{' '}
                         -{' '}
-                        {task.endTime
-                          ? task.endTime.displayTime
-                          : moment(task.endTime).format('hh:mm A')}
+                        {thisTask.endTime
+                          ? thisTask.endTime.displayTime
+                          : moment(thisTask.endTime).format('hh:mm A')}
                       </Text>
                     </View>
                   </View>
                   <TouchableOpacity
-                    onPress={() => toggleSubTask(task._id, task.duration)}>
+                    onPress={() => toggleSubTask(thisTask._id, thisTask.duration)}>
                     <RightArrow width={35} height={35} />
                   </TouchableOpacity>
                 </View>
                 // </Swipeable>
-              );
+              );}
+              else if(subTasks.length < 1){
+                
+                return(
+                  <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                    <Text style={{color: 'white', fontFamily: 'OpenSans-Medium', fontSize: 18}}>No Sub Tasks</Text>
+                  </View>
+                )
+              }
+              else{
+                return(
+                  <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                    <Text style={{color: 'white', fontFamily: 'OpenSans-Medium', fontSize: 18}}>Fetching Sub Tasks..!</Text>
+                  </View>
+                )
+              }
+            
             })}
         </ScrollView>
         <View style={{flex: 1, backgroundColor: 'black'}}>
@@ -850,14 +892,17 @@ const styles = StyleSheet.create({
   plus: {
     width: 60,
     height: 60,
+    position: 'absolute',
+    bottom: height / 100 * 10,
+    zIndex: 10,
     borderRadius: 30,
     backgroundColor: colors.themeGrey,
     alignItems: 'center',
     justifyContent: 'center',
   },
   subTasks: {
-    width: '90%',
-    height: 100,
+    width:'90%',
+    height: 150,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -867,9 +912,11 @@ const styles = StyleSheet.create({
   },
   subTasksRightContainer: {
     flexDirection: 'column',
+    width: '70%',
   },
   subTasksText: {
     color: colors.themeWhite,
+    width: '100%',
     fontSize: 14,
     fontFamily: 'Poppins-Medium',
   },

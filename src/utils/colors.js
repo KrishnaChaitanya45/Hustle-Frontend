@@ -4,9 +4,14 @@ const colors = {
   themeBlack: '#17181A',
   themeBlue: '#1F6BFF',
   themeYellow: '#E8C547',
+  themeLightBlue: '#DEECEC',
+  themeLightWhite: '#F3F5F7',
   themeWhite: '#fefefe',
   themeGreen: '#6BF178',
   themeGrey: '#474E68',
+  themeLightYellow: '#FBF398',
+  themeLightGreen: '#C9FDC7',
+
   categories: [
     {label: '🏢 Work', value: 'work', color: '#E4F2FB'},
     {label: '💻 Productivity', value: 'productivity', color: '#B9F3E4'},

@@ -271,7 +271,7 @@ const AllTasks = ({navigation}) => {
               return (percentage = 0);
             if (task.workingTasks && task.completedTasks) {
               percentage = Math.ceil(
-                ((+task.workingTasks.length + +task.completedTasks.length) /
+                ((+task.completedTasks.length) /
                   +task.subtasks.length) *
                   100,
               );

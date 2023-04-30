@@ -10,6 +10,7 @@ import {
 import React from 'react';
 import Plus from '../../../assets/icons/plus.svg';
 import CreateIcon from '../../../assets/icons/pencil.svg';
+import PlanYourDayIcon from ' ../../../assets/icons/plan-your-day.svg';
 import colors from '../../utils/colors';
 const AddButton = ({opened, toggleOpened, navigation}) => {
   const animation = React.useRef(new Animated.Value(0)).current;
@@ -81,34 +82,32 @@ const AddButton = ({opened, toggleOpened, navigation}) => {
             <CreateIcon width={35} height={35} />
           </TouchableOpacity>
         </Animated.View>
-        <TouchableOpacity>
-          <Animated.View
-            style={[
-              styles.items,
-              opacity,
-              {
-                transform: [
-                  {
-                    translateX: animation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, 60],
-                    }),
-                  },
-                  {
-                    translateY: animation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -50],
-                    }),
-                  },
-                ],
-              },
-            ]}>
-            <Image
-              source={require('../../../assets/icons/diary-icon.png')}
-              styles={styles.itemIcon}
-            />
-          </Animated.View>
-        </TouchableOpacity>
+        <Animated.View
+          style={[
+            styles.items,
+            opacity,
+            {
+              transform: [
+                {
+                  translateX: animation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 60],
+                  }),
+                },
+                {
+                  translateY: animation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, -50],
+                  }),
+                },
+              ],
+            },
+          ]}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('plan-your-day')}>
+            <PlanYourDayIcon width={25} height={25} />
+          </TouchableOpacity>
+        </Animated.View>
         <TouchableOpacity onPress={toggleOpened} style={styles.addButton}>
           <Animated.View
             style={[
