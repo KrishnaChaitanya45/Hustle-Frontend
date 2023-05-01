@@ -12,173 +12,18 @@ import {
 import moment from 'moment';
 //@ts-ignore
 import ClockIcon from '../../../assets/icons/clocktask.svg';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 const {width, height} = Dimensions.get('window');
-const StepperComponent = () => {
-  const data = [
-    {
-      id: 1,
+const StepperComponent = ({data, navigation}: {data: any; navigation: any}) => {
+  const linesHeight = data ? data.length * (height * 0.2) : 0;
+  const cardsHeight = data
+    ? data.map((item: any) => item.tasks.length * 70 + 10)
+    : 100;
 
-      time: '10:00 AM',
-      task: [
-        {
-          title: 'Step 1',
-          description: 'Step 1 description',
-          date: '2021-06-01',
-          duration: '1 hour',
-          isCompleted: true,
-          isCurrent: false,
-          isUpcoming: false,
-        },
-        {
-          title: 'Step 1',
-          description: 'Step 1 description',
-          date: '2021-06-01',
-          duration: '1 hour',
-          isCompleted: true,
-          isCurrent: false,
-          isUpcoming: false,
-        },
-      ],
-    },
-    {
-      id: 2,
-
-      time: '11:00 AM',
-      task: [
-        {
-          title: 'Step 2',
-          description: 'Step 2 description',
-          date: '2021-06-01',
-          duration: '1 hour',
-          isCompleted: true,
-          isCurrent: false,
-          isUpcoming: false,
-        },
-        {
-          title: 'Step 1',
-          description: 'Step 1 description',
-          date: '2021-06-01',
-          duration: '1 hour',
-          isCompleted: true,
-          isCurrent: false,
-          isUpcoming: false,
-        },
-      ],
-    },
-    {
-      id: 2,
-
-      time: '11:00 AM',
-      task: [
-        {
-          title: 'Step 2',
-          description: 'Step 2 description',
-          date: '2021-06-01',
-          duration: '1 hour',
-          isCompleted: true,
-          isCurrent: false,
-          isUpcoming: false,
-        },
-        {
-          title: 'Step 1',
-          description: 'Step 1 description',
-          date: '2021-06-01',
-          duration: '1 hour',
-          isCompleted: true,
-          isCurrent: false,
-          isUpcoming: false,
-        },
-      ],
-    },
-    {
-      id: 2,
-
-      time: '11:00 AM',
-      task: [
-        {
-          title: 'Step 2',
-          description: 'Step 2 description',
-          date: '2021-06-01',
-          duration: '1 hour',
-          isCompleted: true,
-          isCurrent: false,
-          isUpcoming: false,
-        },
-        {
-          title: 'Step 1',
-          description: 'Step 1 description',
-          date: '2021-06-01',
-          duration: '1 hour',
-          isCompleted: true,
-          isCurrent: false,
-          isUpcoming: false,
-        },
-      ],
-    },
-    {
-      id: 2,
-
-      time: '11:00 AM',
-      task: [
-        {
-          title: 'Step 2',
-          description: 'Step 2 description',
-          date: '2021-06-01',
-          duration: '1 hour',
-          isCompleted: true,
-          isCurrent: false,
-          isUpcoming: false,
-        },
-        {
-          title: 'Step 1',
-          description: 'Step 1 description',
-          date: '2021-06-01',
-          duration: '1 hour',
-          isCompleted: true,
-          isCurrent: false,
-          isUpcoming: false,
-        },
-      ],
-    },
-    {
-      id: 2,
-
-      time: '11:00 AM',
-      task: [
-        {
-          title: 'Step 2',
-          description: 'Step 2 description',
-          date: '2021-06-01',
-          duration: '1 hour',
-          isCompleted: true,
-          isCurrent: false,
-          isUpcoming: false,
-        },
-        {
-          title: 'Step 1',
-          description: 'Step 1 description',
-          date: '2021-06-01',
-          duration: '1 hour',
-          isCompleted: true,
-          isCurrent: false,
-          isUpcoming: false,
-        },
-      ],
-    },
-  ];
-  const linesHeight = data.length * (height * 0.1);
-  const cardsHeight = data.map(item => item.task.length * 70 + 10);
   const totalContainerHeight =
-    linesHeight + cardsHeight.reduce((a, b) => a + b, 0);
+    linesHeight + cardsHeight.reduce((a: any, b: any) => a + b, 0);
   console.log(totalContainerHeight);
-  const startTime = moment('10:00 AM', 'hh:mm a');
-  const endTime = moment('11:00 PM', 'hh:mm a');
-  const diffInHours = endTime.diff(startTime, 'hours');
 
-  let hours = [];
-  for (let i = 0; i <= diffInHours; i++) {
-    hours.push(startTime.clone().add(i, 'hours').format('HH:mm A'));
-  }
   return (
     <ScrollView
       contentContainerStyle={[
@@ -191,7 +36,7 @@ const StepperComponent = () => {
       showsVerticalScrollIndicator={false}>
       <ScrollView contentContainerStyle={[styles.stepContainer, {}]}>
         {data &&
-          data.map((item, index) => {
+          data.map((item: any, index: any) => {
             const generateRandomColor = () => {
               const cardColor = [
                 themeLightGreen,
@@ -208,14 +53,14 @@ const StepperComponent = () => {
                     styles.firstStep,
                     {
                       marginTop: index > 0 ? height * 0.05 : 0,
-                      height: item.task.length * 70 + 10,
+                      height: item.tasks.length * 70 + 10,
                     },
                   ]}>
                   <Text style={styles.timeText}>{item.time}</Text>
                   <View style={styles.stepCircle}></View>
                   <View style={styles.stepContent}>
-                    {item.task &&
-                      item.task.map((item, index) => {
+                    {item.tasks &&
+                      item.tasks.map((item: any, index: any) => {
                         return (
                           <View
                             style={[
@@ -225,9 +70,9 @@ const StepperComponent = () => {
                               },
                             ]}
                             key={index}>
-                            <View style={styles.headingAndTime}>
+                            <TouchableOpacity style={styles.headingAndTime}>
                               <Text style={styles.TaskHeading}>
-                                {item.title}
+                                {item.title.slice(0, 10)}...
                               </Text>
                               <View style={styles.TaskTime}>
                                 <ClockIcon width={20} height={20} />
@@ -235,9 +80,9 @@ const StepperComponent = () => {
                                   {item.duration}
                                 </Text>
                               </View>
-                            </View>
+                            </TouchableOpacity>
                             <Text style={styles.TaskDescription}>
-                              {item.description}
+                              {item.description.slice(0, 30)}...
                             </Text>
                           </View>
                         );
@@ -306,7 +151,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     zIndex: 5,
-
+    minHeight: 100,
     width: '95%',
     justifyContent: 'space-around',
   },

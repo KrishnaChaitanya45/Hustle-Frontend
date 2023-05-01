@@ -272,6 +272,7 @@ const styles = StyleSheet.create({
   },
   interestsContainer: {
     flexGrow: 1,
+    minWidth: '120%',
     margin: 15,
     gap: 10,
     alignItems: 'center',

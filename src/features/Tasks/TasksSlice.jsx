@@ -2,6 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 const initialState = {
   tasks: [],
   subtasks: [],
+  todayTasks: [],
 };
 const tasksSlice = createSlice({
   name: 'tasks',
@@ -10,7 +11,9 @@ const tasksSlice = createSlice({
     addTask: (state, {payload}) => {
       state.tasks = payload;
     },
-
+    addTodaysTask: (state, {payload}) => {
+      state.todayTasks = payload;
+    },
     addSingleTask: (state, {payload}) => {
       state.tasks = [...state.tasks, payload];
     },
@@ -50,6 +53,7 @@ export const {
   removeTask,
   addSubTasks,
   addSingleSubTask,
+  addTodaysTask,
   updateSingleSubTask,
 } = tasksSlice.actions;
 export default tasksSlice.reducer;

@@ -20,7 +20,7 @@ import RightArrow from '../../../assets/icons/right-arrow.svg';
 import LinearGradient from 'react-native-linear-gradient';
 import DonutChart from '../../components/charts/DonutChart';
 import moment from 'moment';
-import {addTask} from '../../features/Tasks/TasksSlice';
+import {addTask, addTodaysTask} from '../../features/Tasks/TasksSlice';
 import {addUser} from '../../features/users/UserSlice';
 const Homepage = ({navigation}) => {
   const [userData, setUserData] = useState(null);
@@ -106,17 +106,22 @@ const Homepage = ({navigation}) => {
   };
   const fetchTodaysTasks = async () => {
     const userId = userData._id;
+    const today = moment(moment().format('YYYY-MM-DD')).toISOString();
+    console.log(today);
+    const url =
+      `https://dear-diary-backend.cyclic.app/api/v1/tasks/${userId}/main-tasks?date=` +
+      today;
+    console.log(url);
     try {
-      const response = await fetch(
-        `https://dear-diary-backend.cyclic.app/api/v1/tasks/${userId}/main-tasks?todaysTasks=true`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+      });
       const data = await response.json();
+      dispatch(addTodaysTask(data.tasks));
+      console.log('todays tasks', data.tasks);
       setTodaysTasks(data.tasks.slice(0, 3));
     } catch (err) {
       console.log('tasks fetch request error');
@@ -323,7 +328,7 @@ const Homepage = ({navigation}) => {
               </TouchableOpacity>
             </View>
             <View style={{gap: 10, marginTop: 10}}>
-              {todaysTasks ? (
+              {todaysTasks && todaysTasks.length > 0 ? (
                 todaysTasks.map((task, index) => {
                   return (
                     <View style={styles.todaysTasksCard} key={index}>

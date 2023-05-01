@@ -11,6 +11,8 @@ import CrossIcon from '../../../assets/icons/cross.svg';
 import OptionsIcon from '../../../assets/icons/more.svg';
 import ScrollableWeekCalander from '../../components/eventCalander/ScrollableWeekCalander';
 import StepperComponent from '../../components/stepper/StepperComponent';
+import {useSelector} from 'react-redux';
+import axios from 'axios';
 const {width, height} = Dimensions.get('window');
 
 const PlanYourDay = ({navigation}: {navigation: any}) => {
@@ -19,6 +21,154 @@ const PlanYourDay = ({navigation}: {navigation: any}) => {
     moment().month(),
   );
 
+  const tasksData = [
+    {
+      id: Math.random().toString(),
+      time: '10:00 AM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '11:00 AM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '12:00 AM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '01:00 PM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '02:00 PM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '03:00 PM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '04:00 PM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '05:00 PM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '06:00 PM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '07:00 PM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '08:00 PM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '09:00 PM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '10:00 PM',
+      tasks: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '11:00 PM',
+      tasks: [],
+    },
+  ];
+  const {tasks} = useSelector((state: any) => state.tasks);
+  const [data, setData] = useState(tasksData);
+
+  const fetchSelectedDateData = async (date: moment.Moment) => {
+    try {
+      const taskdata = await tasks.filter((task: any) => {
+        const startDate = task.start;
+        const endDate = moment(task.deadline).add(1, 'days');
+        const selectedDateDay = moment(date).date();
+        // const selectedDateMonth = moment(currentActiveMonth, 'm').month();
+        const selectedDate = moment()
+          .set('date', selectedDateDay)
+          .set('month', currentActiveMonth);
+
+        const isBetween = moment(selectedDate).isBetween(startDate, endDate);
+        console.log(isBetween);
+        return isBetween;
+      });
+      const formattedData = taskdata.map((task: any) => {
+        const id = task._id;
+        const title = task.title;
+        const description = task.description;
+        const time = task.startTime.displayTime;
+        const fullTime =
+          moment(time, 'hh:mm a').hours() > 12
+            ? `${moment(time, 'hh:mm a').hours() - 12}:00 PM`
+            : `${moment(time, 'hh:mm a').hours()}:00 AM`;
+
+        const durationInSeconds = moment(task.endTime.toCalculate).diff(
+          moment(task.startTime.toCalculate),
+          'seconds',
+        );
+
+        const hours =
+          Math.floor(Math.floor(durationInSeconds / 60) / 60) > 0
+            ? Math.floor(Math.floor(durationInSeconds / 60) / 60)
+            : 0;
+        const minutes =
+          Math.floor(Math.floor(durationInSeconds / 60) % 60) > 0
+            ? Math.floor(Math.floor(durationInSeconds / 60) % 60)
+            : 0;
+        const seconds = durationInSeconds % 60;
+        const duration = `${hours}:${minutes}:${seconds}`;
+        const isCompleted = task.status === 'completed' ? true : false;
+        const isStarted = task.status === 'working' ? true : false;
+        setData((prevData: any) => {
+          const newData = [...prevData];
+          const index = newData.findIndex(
+            (item: any) => item.time === fullTime,
+          );
+          if (index >= 0) {
+            console.log('taskfound');
+            newData[index].tasks.push({
+              id,
+              title,
+              description,
+              redirectTask: task,
+              time,
+              duration,
+              isCompleted,
+              isStarted,
+            });
+          }
+          return newData;
+        });
+      });
+    } catch (error) {
+      console.log('error file fetching');
+    }
+  };
+  React.useEffect(() => {
+    fetchSelectedDateData(selectedDate);
+
+    setData(tasksData);
+  }, [selectedDate]);
+  console.log(data);
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View
@@ -59,7 +209,7 @@ const PlanYourDay = ({navigation}: {navigation: any}) => {
         </View>
       </View>
       <View>
-        <StepperComponent />
+        <StepperComponent data={data} navigation={navigation} />
       </View>
     </ScrollView>
   );

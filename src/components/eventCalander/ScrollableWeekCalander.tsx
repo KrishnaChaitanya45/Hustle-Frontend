@@ -81,11 +81,6 @@ const ScrollableWeekCalander = ({
   }, []);
 
   const renderItem = ({item}: {item: any}) => {
-    const isCurrentMonth =
-      moment(item.key).month() === currentActiveMonth
-        ? {opacity: 1, color: 'white'}
-        : {opacity: 0.4};
-
     const isSelected = selectedDate.isSame(item.key, 'day')
       ? {backgroundColor: themeLightBlue, color: 'black'}
       : {color: themeWhite};
@@ -97,7 +92,6 @@ const ScrollableWeekCalander = ({
         }}>
         <View
           style={[
-            isCurrentMonth,
             isSelected,
             {
               paddingBottom: 2.5,

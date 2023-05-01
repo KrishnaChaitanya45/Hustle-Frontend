@@ -134,12 +134,18 @@ const SubTask = ({navigation}) => {
           moment(taskExists.startTime),
           'seconds',
         );
+
         console.log('duration worked', durationWorkedSeconds);
         const durationInSeconds =
           taskDuration.hours * 3600 +
           taskDuration.minutes * 60 +
           taskDuration.seconds;
-        const durationPending = durationInSeconds - durationWorkedSeconds;
+        let durationPending;
+        if (taskStatus === 'completed') {
+          durationPending = 0;
+        } else {
+          durationPending = durationInSeconds - durationWorkedSeconds;
+        }
         console.log('duration pending', durationPending);
         setTaskDuration({
           hours:
@@ -212,11 +218,13 @@ const SubTask = ({navigation}) => {
     }
   };
   if (timer < 0) {
+    setTaskStatus('completed');
     stopTimer();
+    setTimer(0);
   }
   const backHandler = async () => {
     console.log(tasksWorking);
-    if (taskProgress.length > 0) {
+    if (taskProgress.length > 0 && taskStatus !== 'completed') {
       console.log('reached here - 1');
       if (currentWorkingTask) {
         console.log('reached here - 2');
@@ -292,7 +300,7 @@ const SubTask = ({navigation}) => {
         }
       }
     }
-    if (!currentWorkingTask) {
+    if (!currentWorkingTask || taskStatus === 'completed') {
       navigation.navigate('all-tasks', {
         name: 'user',
       });
@@ -411,12 +419,14 @@ const SubTask = ({navigation}) => {
         </Text> */}
 
         <Text>
-          {Math.floor(Math.floor(timer / 60) / 60) +
-            ' hr ' +
-            (Math.floor(timer / 60) % 60) +
-            ' min ' +
-            (timer % 60) +
-            ' s'}
+          {taskStatus != 'completed'
+            ? Math.floor(Math.floor(timer / 60) / 60) +
+              ' hr ' +
+              (Math.floor(timer / 60) % 60) +
+              ' min ' +
+              (timer % 60) +
+              ' s'
+            : 'Task Completed'}
         </Text>
 
         <Button onPress={() => startTimer()} title="play" />

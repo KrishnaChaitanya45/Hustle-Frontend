@@ -80,12 +80,40 @@ const CreateTask = ({navigation}) => {
   };
 
   const handleConfirm = time => {
-    setStartTime(moment(time).unix());
+    const fullTime = {
+      hour:
+        moment(time).hour() > 12
+          ? moment(time).hour() - 12
+          : moment(time).hour(),
+      fullhour: moment(time).hour(),
+      minute: moment(time).minutes(),
+      seconds: moment(time).seconds(),
+      toCalculate: time,
+      ampm: moment(time).hour() > 12 ? 'PM' : 'AM',
+      displayTime: moment(time).format('hh:mm A'),
+    };
+
+    setStartTime(fullTime);
+
     hideStartTimePicker();
   };
 
   const handleEndConfirm = time => {
-    setEndTime(moment(time).unix());
+    const fullTime = {
+      hour:
+        moment(time).hour() > 12
+          ? moment(time).hour() - 12
+          : moment(time).hour(),
+      fullhour: moment(time).hour(),
+      minute: moment(time).minutes(),
+      seconds: moment(time).seconds(),
+      toCalculate: time,
+      ampm: moment(time).hour() > 12 ? 'PM' : 'AM',
+      displayTime: moment(time).format('hh:mm A'),
+    };
+
+    setEndTime(fullTime);
+
     hideEndTimePicker();
   };
 
@@ -97,6 +125,8 @@ const CreateTask = ({navigation}) => {
       setEndDate(startDate);
     }
   }
+  console.log(moment(startDate));
+  console.log(endDate);
   const [taskName, setTaskName] = useState('');
   const [description, setDescription] = useState('');
   const handleSubmit = async () => {
@@ -283,7 +313,7 @@ const CreateTask = ({navigation}) => {
                       fontFamily: 'Poppins-Medium',
                     }}>
                     {startTime
-                      ? moment.unix(startTime).format('hh:mm A')
+                      ? moment(startTime).format('hh:mm A')
                       : moment(Date.now()).format('hh:mm A')}
                   </Text>
 
@@ -345,9 +375,7 @@ const CreateTask = ({navigation}) => {
 
                     fontFamily: 'Poppins-Medium',
                   }}>
-                  {endTime
-                    ? moment.unix(endTime).format('hh:mm A')
-                    : 'End time'}
+                  {endTime ? moment(endTime).format('hh:mm A') : 'End time'}
                 </Text>
 
                 <DateTimePickerModal
