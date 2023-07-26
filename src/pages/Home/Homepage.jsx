@@ -2,6 +2,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Dimensions,
   Image,
   TouchableOpacity,
   ScrollView,
@@ -22,6 +23,7 @@ import DonutChart from '../../components/charts/DonutChart';
 import moment from 'moment';
 import {addTask, addTodaysTask} from '../../features/Tasks/TasksSlice';
 import {addUser} from '../../features/users/UserSlice';
+const {width, height} = Dimensions.get('window');
 const Homepage = ({navigation}) => {
   const [userData, setUserData] = useState(null);
   const {tasks} = useSelector(state => state.tasks);
@@ -37,37 +39,46 @@ const Homepage = ({navigation}) => {
   };
   const dispatch = useDispatch();
   const getUserDetails = async () => {
-    if (user.length === 0) {
+    try {
+      console.log('TRIED TO FETCH COOKIE');
+      const cookie = await AsyncStorage.getItem('deardiary');
+      console.log(cookie);
+      // console.log(cookie);
       try {
-        const cookie = await AsyncStorage.getItem('deardiary');
-        try {
-          const response = await fetch(
-            `https://dear-diary-backend.cyclic.app/api/v1/auth/login/user-details/${cookie}`,
-            {
-              method: 'GET',
+        const response = await fetch(
+          `https://deardiary-backend.onrender.com/api/v1/auth/login/user-details/${cookie}`,
+          {
+            method: 'GET',
 
-              headers: {
-                'Content-Type': 'application/json',
-              },
+            headers: {
+              'Content-Type': 'application/json',
             },
-          );
-          const data = await response.json();
-          setUserData(data.user);
-          dispatch(addUser(data.user));
-          return data.user;
-        } catch (error) {
-          showToast(
-            'Server Side Error 😢..!',
-            "We'll fix this error thanks for being patient 😄..!",
-            'error',
-          );
-          console.log(error);
-        }
+          },
+        );
+
+        const data = await response.json();
+        console.log(data.user);
+        setUserData(data.user);
+        dispatch(addUser(data.user));
+        return data.user;
       } catch (error) {
-        console.log('failed fetch request');
+        showToast(
+          'Server Side Error 😢..!',
+          "We'll fix this error thanks for being patient 😄..!",
+          'error',
+        );
+        console.log(error);
       }
-    } else {
-      setUserData(user);
+    } catch (error) {
+      // showToast(
+      //   'Something went wrong 😢..!',
+      //   "We'll fix this error thanks for being patient 😄..!",
+      //   'error',
+      // );
+      setTimeout(() => {
+        navigation.navigate('login');
+      }, 3000);
+      console.log("Something went wrong, we'll fix it soon");
     }
   };
   const fetchWorkingTasks = async () => {
@@ -75,7 +86,7 @@ const Homepage = ({navigation}) => {
     if (tasks.length === 0) {
       try {
         const response = await fetch(
-          `https://dear-diary-backend.cyclic.app/api/v1/tasks/${userId}/main-tasks`,
+          `https://deardiary-backend.onrender.com/api/v1/tasks/${userId}/main-tasks`,
           {
             method: 'GET',
             headers: {
@@ -106,11 +117,10 @@ const Homepage = ({navigation}) => {
   };
   const fetchTodaysTasks = async () => {
     const userId = userData._id;
+
     const today = moment(moment().format('YYYY-MM-DD')).toISOString();
     console.log(today);
-    const url =
-      `https://dear-diary-backend.cyclic.app/api/v1/tasks/${userId}/main-tasks?date=` +
-      today;
+    const url = `https://deardiary-backend.onrender.com/api/v1/tasks/${userId}/main-tasks?todaysTasks`;
     console.log(url);
     try {
       const response = await fetch(url, {
@@ -128,6 +138,7 @@ const Homepage = ({navigation}) => {
     }
   };
   useEffect(() => {
+    console.log('==== Initial Loading =====');
     setLoading(true);
     if (!userData) {
       console.log('fetched user');
@@ -139,13 +150,14 @@ const Homepage = ({navigation}) => {
     if (userData) {
       setLoadingWorkingTasks(true);
       fetchWorkingTasks();
-
       setLoadingWorkingTasks(false);
       setLoadingTodaysTasks(true);
       fetchTodaysTasks();
       setLoadingTodaysTasks(false);
+      setLoading(false);
     }
   }, [userData]);
+  console.log("=== USER FETCHED ===", userData);
   return (
     <TabContainer>
       {userData && !Loading ? (
@@ -154,8 +166,8 @@ const Homepage = ({navigation}) => {
             <View style={{justifyContent: 'center'}}>
               <Text style={styles.uppertext}>Hi {userData.name}</Text>
               <Text style={styles.lowertext}>
-                {userData.pendingTasks.length > 0
-                  ? `You have ${userData.pendingTasks.length} pending tasks 😢 `
+                {userData.assignedTasks.length - userData.completedTasks.length > 0
+                  ? `You have ${userData.assignedTasks.length - userData.completedTasks.length} pending tasks 😢 `
                   : `You have no pending tasks😇`}
               </Text>
             </View>
@@ -184,7 +196,13 @@ const Homepage = ({navigation}) => {
               }}>
               <Text style={styles.subHeader}>My Goals</Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate('all-tasks')}>
+                onPress={() =>
+                  navigation.navigate('all-tasks', {
+                    reload: true,
+                    userId: userData._id,
+                    fetch: false,
+                  })
+                }>
                 <RightArrow width={30} height={30} />
               </TouchableOpacity>
             </View>
@@ -199,9 +217,15 @@ const Homepage = ({navigation}) => {
               horizontal>
               {workingTasks && workingTasks.length > 0 ? (
                 workingTasks.map((task, index) => {
-                  const percentage = Math.floor(
-                    (task.completedTasks.length / task.subtasks.length) * 100,
-                  );
+                  const percentage =
+                    Math.floor(
+                      (task.completedTasks.length / task.subtasks.length) * 100,
+                    ) >= 100
+                      ? 100
+                      : Math.floor(
+                          (task.completedTasks.length / task.subtasks.length) *
+                            100,
+                        );
                   let color;
                   if (percentage < 50) {
                     color = colors.themeRed;
@@ -258,18 +282,11 @@ const Homepage = ({navigation}) => {
                       alignItems: 'center',
                     },
                   ]}>
-                  <View
-                    style={[
-                      styles.indTask,
-                      {
-                        alignItems: 'center',
-                      },
-                    ]}>
+                  <View style={[styles.indTask, {}]}>
                     <RegretIcon width={50} height={50} />
                     <Text style={styles.taskTitle}>No Working Tasks..!</Text>
                     <Text style={styles.taskDescription}>
-                      "You have no tasks to work on, please add some tasks or
-                      work on your pending tasks"
+                      You have no tasks to work on, please add some tasks
                     </Text>
                   </View>
                 </View>
@@ -360,13 +377,6 @@ const Homepage = ({navigation}) => {
                 })
               ) : LoadingTodaysTasks ? (
                 <View style={styles.todaysTasksCard}>
-                  <Lottie
-                    source={personRunning}
-                    autoPlay
-                    loop
-                    width={45}
-                    height={45}
-                  />
                   <View>
                     <Text style={styles.todaysTasksCardText}>
                       Loading Tasks...
@@ -388,9 +398,14 @@ const Homepage = ({navigation}) => {
         </ScrollView>
       ) : (
         <View style={styles.ErrorPage}>
-          <Lottie source={personRunning} autoPlay loop />
+          <Lottie
+            source={personRunning}
+            autoPlay
+            loop
+            style={styles.animationLoadingCharacter}
+          />
           <TouchableOpacity onPress={() => navigation.navigate('register')}>
-            <Text style={styles.ErrorText}>Try Again</Text>
+            <Text style={styles.ErrorText}>Fetching Tasks..!</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -494,15 +509,23 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   ErrorPage: {
-    flex: 1,
-    backgroundColor: colors.themeBlack,
+    height: '100%',
+    padding: '10%',
     alignItems: 'center',
+    backgroundColor: colors.themeBlack,
     justifyContent: 'center',
+  },
+  animationLoadingCharacter: {
+    width: width,
+    height: height / 2,
+    position: 'absolute',
+    top: '10%',
   },
   ErrorText: {
     fontFamily: 'Poppins-Bold',
     fontSize: 20,
-    color: colors.themeYellow,
+    transform: [{translateY: 100}],
+    color: colors.themeWhite,
   },
   ErrorTextMessage: {
     fontFamily: 'Lato-Medium',

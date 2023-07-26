@@ -142,6 +142,8 @@ const WeekCalander = ({
                       setClicked(0);
                       setStartIndex(null);
                     }
+                  } else {
+                    return;
                   }
                 }
 

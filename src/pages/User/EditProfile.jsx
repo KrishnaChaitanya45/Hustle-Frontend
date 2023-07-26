@@ -204,7 +204,7 @@ const EditProfile = ({navigation}) => {
         console.log('request sent');
 
         const response = await axios.patch(
-          `https://dear-diary-backend.cyclic.app/api/v1/auth/update/${userData._id}`,
+          `https://deardiary-backend.onrender.com/api/v1/auth/update/${userData._id}`,
 
           body,
           {

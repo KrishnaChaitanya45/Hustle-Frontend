@@ -181,19 +181,21 @@ const RegisterTwo = props => {
       body.append('bio', validbio);
       body.append('targetTasks', validtasks);
       body.append('interests', Interests);
-      const profileImage = {
-        uri: image.uri,
-        type: image.type,
-        name: `${name}'s-profile-picture.jpg}`,
-      };
-      body.append('image', profileImage);
+      if (image) {
+        const profileImage = {
+          uri: image.uri,
+          type: image.type,
+          name: `${name}'s-profile-picture.jpg}`,
+        };
+        body.append('image', profileImage);
+      }
       console.log(body);
       //name , email, password, bio, interests, username, profilePhoto, targetTasks
       try {
         console.log('request sent');
 
         const response = await axios.post(
-          'https://dear-diary-backend.cyclic.app/api/v1/auth/register',
+          'https://deardiary-backend.onrender.com/api/v1/auth/register',
 
           body,
           {
@@ -218,6 +220,7 @@ const RegisterTwo = props => {
           'Sorry for the inconvenience. We are working on it 🙍‍♂️',
           'error',
         );
+        console.log("Couldn't register");
         // props.navigation.navigate('register');
         console.log(error.response.data, error);
       }
@@ -276,7 +279,7 @@ const RegisterTwo = props => {
                 }
                 width={210}
                 height={210}
-                resizeMode="stretch"
+                resizeMode="cover"
                 style={{
                   width: 210,
                   height: 210,

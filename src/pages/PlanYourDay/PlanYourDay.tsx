@@ -39,47 +39,47 @@ const PlanYourDay = ({navigation}: {navigation: any}) => {
     },
     {
       id: Math.random().toString(),
-      time: '01:00 PM',
+      time: '1:00 PM',
       tasks: [],
     },
     {
       id: Math.random().toString(),
-      time: '02:00 PM',
+      time: '2:00 PM',
       tasks: [],
     },
     {
       id: Math.random().toString(),
-      time: '03:00 PM',
+      time: '3:00 PM',
       tasks: [],
     },
     {
       id: Math.random().toString(),
-      time: '04:00 PM',
+      time: '4:00 PM',
       tasks: [],
     },
     {
       id: Math.random().toString(),
-      time: '05:00 PM',
+      time: '5:00 PM',
       tasks: [],
     },
     {
       id: Math.random().toString(),
-      time: '06:00 PM',
+      time: '6:00 PM',
       tasks: [],
     },
     {
       id: Math.random().toString(),
-      time: '07:00 PM',
+      time: '7:00 PM',
       tasks: [],
     },
     {
       id: Math.random().toString(),
-      time: '08:00 PM',
+      time: '8:00 PM',
       tasks: [],
     },
     {
       id: Math.random().toString(),
-      time: '09:00 PM',
+      time: '9:00 PM',
       tasks: [],
     },
     {
@@ -108,9 +108,10 @@ const PlanYourDay = ({navigation}: {navigation: any}) => {
           .set('month', currentActiveMonth);
 
         const isBetween = moment(selectedDate).isBetween(startDate, endDate);
-        console.log(isBetween);
+
         return isBetween;
       });
+      console.log('=== taskdata ===', taskdata);
       const formattedData = taskdata.map((task: any) => {
         const id = task._id;
         const title = task.title;
@@ -120,6 +121,13 @@ const PlanYourDay = ({navigation}: {navigation: any}) => {
           moment(time, 'hh:mm a').hours() > 12
             ? `${moment(time, 'hh:mm a').hours() - 12}:00 PM`
             : `${moment(time, 'hh:mm a').hours()}:00 AM`;
+        console.log('fullTime', fullTime);
+        data.map((item: any) => {
+          console.log('=== ITEM TIME ===', item.time);
+          if (item.time === fullTime) {
+            console.log('==== SAME TIME ====', item);
+          }
+        });
 
         const durationInSeconds = moment(task.endTime.toCalculate).diff(
           moment(task.startTime.toCalculate),
@@ -143,6 +151,7 @@ const PlanYourDay = ({navigation}: {navigation: any}) => {
           const index = newData.findIndex(
             (item: any) => item.time === fullTime,
           );
+          console.log('index', index);
           if (index >= 0) {
             console.log('taskfound');
             newData[index].tasks.push({
@@ -168,7 +177,7 @@ const PlanYourDay = ({navigation}: {navigation: any}) => {
 
     setData(tasksData);
   }, [selectedDate]);
-  console.log(data);
+  console.log('=== DATA === ', data);
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View
@@ -188,7 +197,6 @@ const PlanYourDay = ({navigation}: {navigation: any}) => {
               navigation.navigate('user', {
                 name: 'user',
               });
-              console.log('black');
             }}
             style={styles.crossIcon}>
             <CrossIcon width={30} height={30} />

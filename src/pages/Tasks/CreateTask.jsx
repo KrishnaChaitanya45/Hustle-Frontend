@@ -26,7 +26,7 @@ const {width, height} = Dimensions.get('window');
 const CreateTask = ({navigation}) => {
   const [clicked, setClicked] = useState(null);
   const dispatch = useDispatch();
-  const [startTime, setStartTime] = useState(null);
+  const [startTime, setStartTime] = useState(moment(Date.now()));
   const [endTime, setEndTime] = useState(null);
   const categories = [
     {label: '🏢 Work', value: 'work', color: '#E4F2FB'},
@@ -149,9 +149,9 @@ const CreateTask = ({navigation}) => {
       showToast('Invalid Start Time', 'Please select a start time', 'error');
     } else if (!endTime) {
       showToast('Invalid End Time', 'Please select a end time', 'error');
-    } else if (moment(startDate).isAfter(endDate)) {
+    } else if (moment(startDate.toCalculate).isAfter(endDate.toCalculate)) {
       showToast('Invalid Date', 'Start date cannot be after end date', 'error');
-    } else if (moment(startTime).isAfter(endTime)) {
+    } else if (moment(startTime.toCalculate).isAfter(endTime.toCalculate)) {
       showToast('Invalid Time', 'Start time cannot be after end time', 'error');
     } else {
       let body = {
@@ -171,7 +171,7 @@ const CreateTask = ({navigation}) => {
         try {
           console.log('request sent');
           const response = await axios.post(
-            `https://dear-diary-backend.cyclic.app/api/v1/tasks/${userId}/main-tasks`,
+            `https://deardiary-backend.onrender.com/api/v1/tasks/${userId}/main-tasks`,
             body,
           );
           dispatch(addSingleTask(response.data.task));
@@ -182,7 +182,7 @@ const CreateTask = ({navigation}) => {
               'success',
             );
             setTimeout(() => {
-              navigation.navigate('all-tasks');
+              navigation.navigate('all-tasks', {reload: true});
             }, 3000);
           }
         } catch (error) {
@@ -313,7 +313,7 @@ const CreateTask = ({navigation}) => {
                       fontFamily: 'Poppins-Medium',
                     }}>
                     {startTime
-                      ? moment(startTime).format('hh:mm A')
+                      ? startTime.displayTime
                       : moment(Date.now()).format('hh:mm A')}
                   </Text>
 
@@ -375,7 +375,7 @@ const CreateTask = ({navigation}) => {
 
                     fontFamily: 'Poppins-Medium',
                   }}>
-                  {endTime ? moment(endTime).format('hh:mm A') : 'End time'}
+                  {endTime ? endTime.displayTime : 'End time'}
                 </Text>
 
                 <DateTimePickerModal
@@ -423,9 +423,7 @@ const CreateTask = ({navigation}) => {
                   <TouchableOpacity
                     key={category.value}
                     onPress={() => {
-                      if (!Category) {
-                        setCategory(category.value);
-                      }
+                      setCategory(category.value);
                     }}>
                     <Text
                       style={{
@@ -492,7 +490,7 @@ export default CreateTask;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
     flexDirection: 'column',
     backgroundColor: colors.themeBlack,

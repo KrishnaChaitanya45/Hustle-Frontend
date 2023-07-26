@@ -70,16 +70,30 @@ const ScrollableWeekCalander = ({
         data.filter(
           (item: any) => moment(item.key).month() === moment().month(),
         ),
-      );
-      if (activeDates) {
-        datesRef.current?.scrollToIndex({
-          index: moment().date(),
-          animated: true,
-        });
+        );
+      
+
+      if (data.filter(
+        (item: any) => moment(item.key).month() === moment().month(),
+      )) {
+        const index = data.find((date)=>{
+          return moment(date.key).format('YYYY-MM-DD') == moment().format('YYYY-MM-DD')
+        })!.date;
+        console.log("===INDEX ===", index);
+        if(index && activeDates  ){
+          
+          datesRef.current?.scrollToIndex({
+            index:index-6
+          });
+          // datesRef.current?.scrollToIndex({
+          //   index:index,
+          //   animated: true,
+          // });
+        }
+       
       }
     }
-  }, []);
-
+  }, [activeDates && activeDates.length]);
   const renderItem = ({item}: {item: any}) => {
     const isSelected = selectedDate.isSame(item.key, 'day')
       ? {backgroundColor: themeLightBlue, color: 'black'}
@@ -249,6 +263,7 @@ const ScrollableWeekCalander = ({
         <Animated.FlatList
           data={activeDates}
           renderItem={renderItem}
+          getItemLayout={getItemLayout}
           horizontal
           bounces={false}
           ref={datesRef}

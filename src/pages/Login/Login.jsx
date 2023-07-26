@@ -66,7 +66,7 @@ const Login = ({navigation}) => {
       try {
         console.log('requested');
         const {data} = await axios.post(
-          'https://dear-diary-backend.cyclic.app/api/v1/auth/login',
+          'https://deardiary-backend.onrender.com/api/v1/auth/login',
           body,
         );
         setUser(data.user);
@@ -133,7 +133,7 @@ const Login = ({navigation}) => {
                     marginTop: 50,
                     marginBottom: 20,
                     fontSize: 35,
-                    fontWeight: 800,
+                    fontFamily:"Poppins-Bold"
                   }}>
                   Login 🚀
                 </Text>
@@ -153,7 +153,7 @@ const Login = ({navigation}) => {
                     outlineColor={emailError ? 'red' : 'black'}
                     onChangeText={text => setEmail(text)}
                     activeUnderlineColor={emailError ? 'red' : 'black'}
-                    value={email}
+                    value={email ? email : ""}
                   />
                   <TextInput
                     label="Password"
@@ -171,8 +171,8 @@ const Login = ({navigation}) => {
                     onChangeText={text => setPassword(text)}
                     activeUnderlineColor={passwordError ? 'red' : 'black'}
                     value={password}
-                      secureTextEntry
-      // right={<TextInput.Icon icon="eye" />} 
+                    secureTextEntry
+                    // right={<TextInput.Icon icon="eye" />}
                   />
                   <View
                     style={{
@@ -187,7 +187,7 @@ const Login = ({navigation}) => {
                       style={{backgroundColor: 'black'}}
                       onPress={submitHandler}>
                       <Text
-                        style={{fontSize: 18, fontWeight: 600, color: '#fff'}}>
+                        style={{fontSize: 18, color: '#fff', fontFamily:"Poppins-Medium"}}>
                         Submit 👍
                       </Text>
                     </TouchableOpacity>
@@ -207,10 +207,12 @@ const Login = ({navigation}) => {
               <Text style={{fontWeight: 600, fontSize: 16}}>
                 Don't have an Account?
               </Text>
-              <Button
-                title="Register"
+              <TouchableOpacity
+              style={{backgroundColor: 'black', padding: 7.5, borderRadius: 10}}
                 onPress={() => navigation.navigate('register')}
-              />
+              >
+                <Text style={{ fontSize:14, fontFamily: 'Poppins-Medium'}}> Register </Text>
+                </TouchableOpacity>
             </View>
           </View>
         </View>

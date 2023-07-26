@@ -144,7 +144,7 @@ const EditTask = ({navigation}) => {
         try {
           console.log('request sent');
           const response = await axios.patch(
-            `https://dear-diary-backend.cyclic.app/api/v1/tasks/${userId}/main-tasks/${task._id}`,
+            `https://deardiary-backend.onrender.com/api/v1/tasks/${userId}/main-tasks/${task._id}`,
             body,
           );
           dispatch(updateSingleTask(response.data.task));
@@ -286,7 +286,7 @@ const EditTask = ({navigation}) => {
                       fontFamily: 'Poppins-Medium',
                     }}>
                     {startTime
-                      ? moment.unix(startTime).format('hh:mm A')
+                      ? startTime.displayTime
                       : moment(Date.now()).format('hh:mm A')}
                   </Text>
 
@@ -348,9 +348,7 @@ const EditTask = ({navigation}) => {
 
                     fontFamily: 'Poppins-Medium',
                   }}>
-                  {endTime
-                    ? moment.unix(endTime).format('hh:mm A')
-                    : 'End time'}
+                  {endTime ? endTime.displayTime : 'End time'}
                 </Text>
 
                 <DateTimePickerModal

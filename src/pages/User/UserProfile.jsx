@@ -3,17 +3,28 @@ import {
   Text,
   View,
   Image,
+  Dimensions,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import TabContainer from '../../components/Tab/TabContainer';
 import userIcon from '../../../assets/images/avatar1.png';
-import colors from '../../utils/colors';
+import colors, {
+  themeBlack,
+  themeBlue,
+  themeGrey,
+  themeLightBlue,
+  themeLightWhite,
+  themeLightYellow,
+  themePurple,
+  themeYellow,
+} from '../../utils/colors';
 import Dashboard from '../../../assets/icons/dashboard.svg';
 import RightIcon from '../../../assets/icons/right-arrow.svg';
 import EditIcon from '../../../assets/icons/edit.svg';
 import axios from 'axios';
+import FireIcon from '../../../assets/icons/fire.svg';
 import personRunning from '../../../assets/videos/man-running.json';
 import Lottie from 'lottie-react-native';
 import AccountSettings from '../../../assets/icons/settings.svg';
@@ -21,6 +32,7 @@ import PremiumIcon from '../../../assets/icons/star.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {useRoute} from '@react-navigation/native';
+const {width, height} = Dimensions.get('screen');
 const UserProfile = ({navigation}) => {
   //DashBoard Option
   const [userData, setUserData] = useState(null);
@@ -41,7 +53,7 @@ const UserProfile = ({navigation}) => {
     try {
       const id = user._id;
       const response = await axios.get(
-        `https://dear-diary-backend.cyclic.app/api/v1/tasks/${id}/main-tasks`,
+        `https://deardiary-backend.onrender.com/api/v1/tasks/${id}/main-tasks`,
       );
     } catch (error) {}
   };
@@ -50,16 +62,13 @@ const UserProfile = ({navigation}) => {
       console.log(router.params);
       return setUserData(router.params);
     } else {
-      const userStored = await AsyncStorage.getItem('user');
-      setUserData(JSON.parse(userStored));
-      console.log(userData.profilePhoto);
-
       if (!userData) {
         try {
           const cookie = await AsyncStorage.getItem('deardiary');
           try {
+            console.log('FETCH REQUEST SENT');
             const response = await fetch(
-              `https://dear-diary-backend.cyclic.app/api/v1/auth/login/user-details/${cookie}`,
+              `https://deardiary-backend.onrender.com/api/v1/auth/login/user-details/${cookie}`,
               {
                 method: 'GET',
 
@@ -70,7 +79,7 @@ const UserProfile = ({navigation}) => {
             );
 
             const data = await response.json();
-
+            console.log('=== DATA FETCHED ===', data);
             setUserData(data.user);
           } catch (error) {
             showToast(
@@ -87,8 +96,6 @@ const UserProfile = ({navigation}) => {
             'error',
           );
         }
-      } else {
-        return;
       }
     }
   };
@@ -97,7 +104,7 @@ const UserProfile = ({navigation}) => {
     setUserData(null);
     user();
   }, []);
-
+  console.log(userData);
   return (
     <TabContainer>
       <View style={{zIndex: 10}}>
@@ -125,6 +132,12 @@ const UserProfile = ({navigation}) => {
                 {userData.bio.slice(0, 60) ||
                   "You haven't added a bio yet, click on the edit icon to add one..!😉"}
               </Text>
+              <View style={styles.firePoints}>
+                <View style={styles.fireIcon}>
+                  <FireIcon width={30} height={30} />
+                </View>
+                <Text style={styles.firePointsText}>{userData.points}</Text>
+              </View>
               <TouchableOpacity
                 style={styles.editIcon}
                 onPress={() => navigation.navigate('edit-profile', userData)}>
@@ -211,10 +224,12 @@ const styles = StyleSheet.create({
   profileContainer: {
     width: '100%',
     height: '20%',
+    overflow:"hidden",
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: 'black',
+    backgroundColor: themeBlack,
     shadowColor: '#595BD4',
+    gap: 20,
     position: 'relative',
     shadowOffset: {
       width: 0,
@@ -229,19 +244,21 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   userIcon: {
-    width: 90,
-    height: 90,
+    width: width * 0.325,
+    height: height * 0.15,
     borderRadius: 100,
   },
   editIcon: {
     position: 'absolute',
-    top: '-15%',
-    left: '80%',
+    top: '-5%',
+    left: '70%',
   },
   detailsContainer: {
     justifyContent: 'center',
     alignItems: 'flex-start',
-    paddingRight: 10,
+    gap: 2.5,
+    // paddingRight: 10,
+    marginLeft: '15%',
     fontFamily: 'Poppins-Medium',
   },
   name: {
@@ -250,7 +267,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Bold',
   },
   imageContainer: {
-    padding: 20,
+    paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -330,5 +347,29 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     color: colors.themePurple,
+  },
+  firePoints: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // paddingHorizontal: 5,
+    backgroundColor: themeGrey,
+    width: '50%',
+    marginTop: '5%',
+    borderRadius: 20,
+    justifyContent: 'space-between',
+  },
+  fireIcon: {
+    borderRadius: 50,
+    padding: 5,
+    backgroundColor: themeLightYellow,
+    height: '100%',
+    width: '50%',
+    alignItems: 'center',
+  },
+  firePointsText: {
+    width: '50%',
+    textAlign: 'center',
+    fontFamily: 'Poppins-Medium',
+    fontSize: 18,
   },
 });
