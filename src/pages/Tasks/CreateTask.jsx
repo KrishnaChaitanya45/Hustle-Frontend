@@ -171,7 +171,7 @@ const CreateTask = ({navigation}) => {
         try {
           console.log('request sent');
           const response = await axios.post(
-            `https://deardiary-backend.onrender.com/api/v1/tasks/${userId}/main-tasks`,
+            `https://tame-rose-monkey-suit.cyclic.app/api/v1/tasks/${userId}/main-tasks`,
             body,
           );
           dispatch(addSingleTask(response.data.task));

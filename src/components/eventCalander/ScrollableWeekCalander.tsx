@@ -70,27 +70,29 @@ const ScrollableWeekCalander = ({
         data.filter(
           (item: any) => moment(item.key).month() === moment().month(),
         ),
-        );
-      
+      );
 
-      if (data.filter(
-        (item: any) => moment(item.key).month() === moment().month(),
-      )) {
-        const index = data.find((date)=>{
-          return moment(date.key).format('YYYY-MM-DD') == moment().format('YYYY-MM-DD')
+      if (
+        data.filter(
+          (item: any) => moment(item.key).month() === moment().month(),
+        )
+      ) {
+        const index = data.find(date => {
+          return (
+            moment(date.key).format('YYYY-MM-DD') ==
+            moment().format('YYYY-MM-DD')
+          );
         })!.date;
-        console.log("===INDEX ===", index);
-        if(index && activeDates  ){
-          
+        console.log('===INDEX ===', index);
+        if (index && activeDates) {
           datesRef.current?.scrollToIndex({
-            index:index-6
+            index: index > 6 ? index - 6 : index - 1,
           });
           // datesRef.current?.scrollToIndex({
           //   index:index,
           //   animated: true,
           // });
         }
-       
       }
     }
   }, [activeDates && activeDates.length]);
@@ -294,7 +296,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.red,
   },
   text: {
-    fontSize: ITEM_SIZE * 0.4,
+    fontSize: ITEM_SIZE * 0.325,
     fontFamily: 'Poppins-Bold',
     color: colors.text,
   },

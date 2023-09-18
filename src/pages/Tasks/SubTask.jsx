@@ -54,7 +54,7 @@ const SubTask = ({navigation}) => {
   const [timerInterval, setTimerInterval] = useState(null);
   const {task, createdBy, deadline} = router.params;
   console.log(
-    `https://deardiary-backend.onrender.com/api/v1/tasks/${createdBy}/main-tasks/${task.belongsTo}/sub-tasks/${task._id}`,
+    `https://tame-rose-monkey-suit.cyclic.app/api/v1/tasks/${createdBy}/main-tasks/${task.belongsTo}/sub-tasks/${task._id}`,
   );
 
   const [tasksWorkedNow, setTasksWorkedNow] = useState(0);
@@ -177,9 +177,7 @@ const SubTask = ({navigation}) => {
     }
   };
 
-  Linking.addEventListener('url', () => {
-
-  });
+  Linking.addEventListener('url', () => {});
   const startTimer = () => {
     startBackgroundService();
     console.log('=== Timer started ===');
@@ -381,7 +379,7 @@ const SubTask = ({navigation}) => {
         });
         try {
           const {data, status} = await axios.patch(
-            `https://deardiary-backend.onrender.com/api/v1/tasks/${createdBy}/main-tasks/${task.belongsTo}/sub-tasks/${task._id}`,
+            `https://tame-rose-monkey-suit.cyclic.app/api/v1/tasks/${createdBy}/main-tasks/${task.belongsTo}/sub-tasks/${task._id}`,
             {
               progress: taskProgress,
               status: taskStatus,
@@ -411,6 +409,7 @@ const SubTask = ({navigation}) => {
             setTimeout(() => {
               navigation.navigate('all-tasks', {
                 name: 'user',
+                points: data.task.points - task.points,
               });
             }, 4000);
           }
@@ -451,7 +450,7 @@ const SubTask = ({navigation}) => {
       });
       try {
         const {data, status} = await axios.patch(
-          `https://deardiary-backend.onrender.com/api/v1/tasks/${createdBy}/main-tasks/${task.belongsTo}/sub-tasks/${task._id}`,
+          `https://tame-rose-monkey-suit.cyclic.app/api/v1/tasks/${createdBy}/main-tasks/${task.belongsTo}/sub-tasks/${task._id}`,
           {
             progress: taskProgress,
             status: taskStatus,
@@ -465,6 +464,9 @@ const SubTask = ({navigation}) => {
           },
         );
         console.log(data);
+        if (task.points < data.task.points) {
+          console.log('=== TASK POINTS ===', data.task.points);
+        }
         dispatch(updateSingleSubTask(data.task));
 
         if (status === 200) {
@@ -481,6 +483,7 @@ const SubTask = ({navigation}) => {
           setTimeout(() => {
             navigation.navigate('all-tasks', {
               name: 'user',
+              points: data.task.points - task.points,
               reload: true,
             });
           }, 4000);
@@ -694,83 +697,86 @@ const SubTask = ({navigation}) => {
               value={isCompleted}
               onValueChange={async newValue => {
                 setIsCompleted(newValue);
-                Toast.show({
-                  type: 'info',
-                  position: 'top',
-                  text1: 'Task Updating..! 🚀',
-                  text2:
-                    'Updating your progress to our servers..! 🚀, please wait..! ⏳',
-                  visibilityTime: 4000,
-                  autoHide: true,
-                  topOffset: 30,
-                });
-                try {
-                  const url = `https://deardiary-backend.onrender.com/api/v1/tasks/${createdBy}/main-tasks/${task.belongsTo}/sub-tasks/${task._id}`;
-                 
-                  console.log('=== BODY ===', {
-                    progress: taskProgress,
-                    status: 'completed',
-                    percentageWorked: 100,
-                    points: task.points,
-                    progress: taskProgress,
-                    startTime: task.startTime.displayTime,
-                    endTime: task.endTime.displayTime,
-                    duration: task.duration,
-                    startDate: task.start,
-                    endDate: task.deadline,
-                  });
-                  const {data, status} = await axios.patch(url, {
-                    progress: taskProgress,
-                    status: 'completed',
-                    percentageWorked: 100,
-                    points: task.points,
-                    progress: taskProgress,
-                    startTime: task.startTime.displayTime,
-                    endTime: task.endTime.displayTime,
-                    duration: task.duration,
-                    startDate: task.start,
-                    endDate: task.deadline,
-                  });
-
-                  console.log('== RESPONSE DATA ==', data);
-                  dispatch(updateSingleSubTask(data.task));
-
-                  if (status === 200) {
-                    Toast.show({
-                      type: 'success',
-                      position: 'top',
-                      text1: 'Task Updated',
-                      text2:
-                        'Your task has been updated successfully, redirecting to all tasks',
-                      visibilityTime: 4000,
-                      autoHide: true,
-                      topOffset: 30,
-                    });
-                    setTimeout(() => {
-                      navigation.navigate('all-tasks', {
-                        name: 'user',
-                        reload: true,
-                        fetch: false,
-                      });
-                    }, 4000);
-                  }
-                } catch (error) {
+                if (newValue) {
                   Toast.show({
-                    type: 'error',
+                    type: 'info',
                     position: 'top',
-                    text1: 'Task Updating Failed',
+                    text1: 'Task Updating..! 🚀',
                     text2:
-                      'Your task updating has been failed, redirecting to all tasks',
+                      'Updating your progress to our servers..! 🚀, please wait..! ⏳',
                     visibilityTime: 4000,
                     autoHide: true,
                     topOffset: 30,
                   });
-                  console.log(error);
-                  setTimeout(() => {
-                    navigation.navigate('all-tasks', {
-                      name: 'user',
+                  try {
+                    const url = `https://tame-rose-monkey-suit.cyclic.app/api/v1/tasks/${createdBy}/main-tasks/${task.belongsTo}/sub-tasks/${task._id}`;
+
+                    console.log('=== BODY ===', {
+                      progress: taskProgress,
+                      status: 'completed',
+                      percentageWorked: 100,
+                      points: task.points,
+                      progress: taskProgress,
+                      startTime: task.startTime.displayTime,
+                      endTime: task.endTime.displayTime,
+                      duration: task.duration,
+                      startDate: task.start,
+                      endDate: task.deadline,
                     });
-                  }, 4000);
+                    const {data, status} = await axios.patch(url, {
+                      progress: taskProgress,
+                      status: 'completed',
+                      percentageWorked: 100,
+                      points: task.points,
+                      progress: taskProgress,
+                      startTime: task.startTime.displayTime,
+                      endTime: task.endTime.displayTime,
+                      duration: task.duration,
+                      startDate: task.start,
+                      endDate: task.deadline,
+                    });
+
+                    console.log('== RESPONSE DATA ==', data);
+                    dispatch(updateSingleSubTask(data.task));
+
+                    if (status === 200) {
+                      Toast.show({
+                        type: 'success',
+                        position: 'top',
+                        text1: 'Task Updated',
+                        text2:
+                          'Your task has been updated successfully, redirecting to all tasks',
+                        visibilityTime: 4000,
+                        autoHide: true,
+                        topOffset: 30,
+                      });
+                      setTimeout(() => {
+                        navigation.navigate('all-tasks', {
+                          name: 'user',
+                          reload: true,
+                          points: data.task.points - task.points,
+                          fetch: false,
+                        });
+                      }, 4000);
+                    }
+                  } catch (error) {
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      text1: 'Task Updating Failed',
+                      text2:
+                        'Your task updating has been failed, redirecting to all tasks',
+                      visibilityTime: 4000,
+                      autoHide: true,
+                      topOffset: 30,
+                    });
+                    console.log(error);
+                    setTimeout(() => {
+                      navigation.navigate('all-tasks', {
+                        name: 'user',
+                      });
+                    }, 4000);
+                  }
                 }
               }}
               tintColors={{true: themeLightGreen, false: themeLightYellow}}

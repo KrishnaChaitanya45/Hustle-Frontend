@@ -1,8 +1,16 @@
-import {StyleSheet, Text, View, Dimensions, Image} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import React, {useEffect} from 'react';
 import TabContainer from '../../components/Tab/TabContainer';
 import FireIcon from '../../../assets/icons/fire.svg';
-
+import personRunning from '../../../assets/videos/man-running.json';
+import Lottie from 'lottie-react-native';
 import colors, {
   themeBlue,
   themeGreen,
@@ -17,75 +25,94 @@ import {ScrollView} from 'react-native-gesture-handler';
 const {width, height} = Dimensions.get('screen');
 const CommunityHome = () => {
   const [users, setUsers] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
   const fetchUsers = async () => {
     console.log('REQUEST SENT');
     try {
       const response = await fetch(
-        'https://deardiary-backend.onrender.com/api/v1/auth/admin/get-users',
+        'https://tame-rose-monkey-suit.cyclic.app/api/v1/auth/admin/get-users',
       );
       const users = await response.json();
       setUsers(users.users);
       console.log('DATA RECEIVED');
+      setLoading(false);
     } catch (error) {
       console.log('REQUEST FAILED');
     }
   };
   useEffect(() => {
+    // setLoading(true);
     fetchUsers();
   }, []);
 
   return (
     <TabContainer>
-      <View style={styles.container}>
-        <View style={styles.infoContainer}>
-          <Text style={styles.headingInfo}>Users</Text>
-        </View>
-        <ScrollView
-          contentContainerStyle={styles.usersContainer}
-          showsVerticalScrollIndicator={false}>
-          {users.length > 0 &&
-            users.map(user => {
-              console.log(user);
-              return (
-                <View style={styles.userCard}>
-                  <View style={styles.userDetails}>
-                    <View style={styles.firstRow}>
-                      <View style={styles.profilePicContainer}>
-                        <Image
-                          source={{uri: user.profilePhoto}}
-                          style={styles.profilePic}
-                        />
-                      </View>
-                      <Text style={styles.userName}>
-                        {user.name.length > 10
-                          ? user.name.slice(0, 10) + '...'
-                          : user.name}
-                      </Text>
-                      <View style={styles.firePoints}>
-                        <View style={styles.fireIcon}>
-                          <FireIcon width={30} height={30} />
+      {!loading ? (
+        <View style={styles.container}>
+          <View style={styles.infoContainer}>
+            <Text style={styles.headingInfo}>Users</Text>
+          </View>
+          <ScrollView
+            contentContainerStyle={styles.usersContainer}
+            showsVerticalScrollIndicator={false}>
+            {users.length > 0 &&
+              users.map(user => {
+                console.log(user);
+                return (
+                  <View style={styles.userCard}>
+                    <View style={styles.userDetails}>
+                      <View style={styles.firstRow}>
+                        <View style={styles.profilePicContainer}>
+                          <Image
+                            source={{uri: user.profilePhoto}}
+                            style={styles.profilePic}
+                          />
                         </View>
-                        <Text style={styles.firePointsText}>{user.points}</Text>
+                        <Text style={styles.userName}>
+                          {user.name.length > 10
+                            ? user.name.slice(0, 10) + '...'
+                            : user.name}
+                        </Text>
+                        <View style={styles.firePoints}>
+                          <View style={styles.fireIcon}>
+                            <FireIcon width={30} height={30} />
+                          </View>
+                          <Text style={styles.firePointsText}>
+                            {user.points}
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                    <View style={styles.userInterests}>
-                      {user.interests.length > 0 &&
-                        user.interests[0].split(',').map(interest => {
-                          return (
-                            <View style={styles.indInterest}>
-                              <Text style={styles.interestText}>
-                                {interest}
-                              </Text>
-                            </View>
-                          );
-                        })}
+                      <View style={styles.userInterests}>
+                        {user.interests.length > 0 &&
+                          user.interests[0].split(',').map(interest => {
+                            return (
+                              <View style={styles.indInterest}>
+                                <Text style={styles.interestText}>
+                                  {interest}
+                                </Text>
+                              </View>
+                            );
+                          })}
+                      </View>
                     </View>
                   </View>
-                </View>
-              );
-            })}
-        </ScrollView>
-      </View>
+                );
+              })}
+          </ScrollView>
+        </View>
+      ) : (
+        <View style={styles.ErrorPage}>
+          <Lottie
+            source={personRunning}
+            autoPlay
+            loop
+            style={styles.animationLoadingCharacter}
+          />
+          <TouchableOpacity onPress={() => navigation.navigate('register')}>
+            <Text style={styles.ErrorText}>Fetching Users..!</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </TabContainer>
   );
 };
@@ -193,5 +220,31 @@ const styles = StyleSheet.create({
     fontFamily: 'Lato-Bold',
     fontSize: 12,
     color: 'black',
+  },
+  ErrorPage: {
+    height: '100%',
+    padding: '10%',
+    alignItems: 'center',
+    backgroundColor: colors.themeBlack,
+    justifyContent: 'center',
+  },
+  animationLoadingCharacter: {
+    width: width,
+    height: height / 2,
+    position: 'absolute',
+    top: '10%',
+  },
+  ErrorText: {
+    fontFamily: 'Poppins-Bold',
+    fontSize: 20,
+    transform: [{translateY: 100}],
+    color: colors.themeWhite,
+  },
+  ErrorTextMessage: {
+    fontFamily: 'Lato-Medium',
+    maxWidth: '70%',
+    textAlign: 'center',
+    fontSize: 16,
+    color: colors.themePurple,
   },
 });

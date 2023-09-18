@@ -2,7 +2,9 @@ import {createSlice} from '@reduxjs/toolkit';
 const initialState = {
   tasks: [],
   subtasks: [],
+  habits: [],
   todayTasks: [],
+  waffleChart: [],
 };
 const tasksSlice = createSlice({
   name: 'tasks',
@@ -44,6 +46,12 @@ const tasksSlice = createSlice({
     addSingleSubTask: (state, {payload}) => {
       state.subtasks = [...state.subtasks, payload];
     },
+    addHabits: (state, {payload}) => {
+      state.habits = payload;
+    },
+    addWaffleChart: (state, {payload}) => {
+      state.waffleChart = payload;
+    },
   },
 });
 export const {
@@ -54,6 +62,8 @@ export const {
   addSubTasks,
   addSingleSubTask,
   addTodaysTask,
+  addHabits,
   updateSingleSubTask,
+  addWaffleChart,
 } = tasksSlice.actions;
 export default tasksSlice.reducer;

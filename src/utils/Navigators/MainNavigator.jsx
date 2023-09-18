@@ -10,7 +10,6 @@ import BottomNavigator from '../../components/bottombar/BottomNavigator';
 import RegisterTwo from '../../pages/Register/RegisterTwo';
 import {TabContextProvider, useTabMenu} from '../../contexts/TabContexts';
 import AccountSettings from '../../pages/Settings/AccountSettings';
-import UserProfile from '../../pages/User/UserProfile';
 import EditProfile from '../../pages/User/EditProfile';
 import CreateTask from '../../pages/Tasks/CreateTask';
 import AllTasks from '../../pages/Tasks/AllTasks';
@@ -18,23 +17,34 @@ import EditTask from '../../pages/Tasks/EditTask';
 import IndividualMainTask from '../../pages/Tasks/IndividualMainTask';
 import SubTask from '../../pages/Tasks/SubTask';
 import PlanYourDay from '../../pages/PlanYourDay/PlanYourDay';
+import Habits from '../../pages/Habits/Habits';
+import Dashboard from '../../pages/Dashboard/Dashboard';
+import ChatPage from '../../pages/Diary/ChatPage';
+import ChatEdit from '../../pages/Diary/ChatEdit';
+import SearchUser from '../../pages/Diary/SearchUser';
+import MessageWithAttachment from '../../pages/Diary/MessageWithAttachment';
+import {useDispatch, useSelector} from 'react-redux';
+import {setDeviceToken} from '../../features/Socket/SocketSlice';
 const Stack = createNativeStackNavigator();
 const MainNavigator = () => {
   const Splash = ({navigation}) => {
     useEffect(() => {
       checkAuth();
     }, []);
-
+    const token = useSelector(state => state.socket.deviceToken);
+    console.log('=== TOKEN FROM MAIN NAVIGATOR ===', token);
     const checkAuth = async () => {
       try {
         const token = await AsyncStorage.getItem('deardiary');
 
         if (token) {
-          navigation.navigate('homepage');
+          setTimeout(async () => {
+            navigation.navigate('homepage');
+          }, 5000);
         } else {
           setTimeout(async () => {
             navigation.navigate('login');
-          }, 2000);
+          }, 5000);
         }
       } catch (error) {
         console.log('No key exists in AsyncStorage');
@@ -50,7 +60,7 @@ const MainNavigator = () => {
           justifyContent: 'center',
           flexGrow: 1,
         }}>
-        <Text style={{color: 'white', fontSize: 28}}>Dear Diary</Text>
+        <Text style={{color: 'white', fontSize: 28}}>Hustle 🔥</Text>
       </View>
     );
   };
@@ -76,6 +86,15 @@ const MainNavigator = () => {
           <Stack.Screen name="ind-task" component={IndividualMainTask} />
           <Stack.Screen name="sub-task" component={SubTask} />
           <Stack.Screen name="plan-your-day" component={PlanYourDay} />
+          <Stack.Screen name="habits" component={Habits} />
+          <Stack.Screen name="dashboard" component={Dashboard} />
+          <Stack.Screen name="ChatScreen" component={ChatPage} />
+          <Stack.Screen name="group-chat-edit" component={ChatEdit} />
+          <Stack.Screen name="SearchUser" component={SearchUser} />
+          <Stack.Screen
+            name="message-with-attachment"
+            component={MessageWithAttachment}
+          />
 
           {/* <Stack.Screen name="forgotpassword" component={Forgot} /> */}
         </Stack.Navigator>

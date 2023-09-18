@@ -32,6 +32,7 @@ import {addSubTasks} from '../../features/Tasks/TasksSlice';
 import {TextInput} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import {Timer, Countdown} from 'react-native-element-timer';
+import PopUpModal from '../../components/modal/Modal';
 const {width, height} = Dimensions.get('window');
 const IndividualMainTask = ({navigation}) => {
   const [isModelVisible, setIsModelVisible] = useState(false);
@@ -48,6 +49,7 @@ const IndividualMainTask = ({navigation}) => {
   const [startDate, setStartDate] = useState(moment());
   const [clicked, setClicked] = useState(null);
   const [Loading, setLoading] = useState(false);
+  const [pointsModalOpen, setPointsModalOpen] = useState(false);
   const [percentage, setPercentage] = useState(0);
   const [timer, setTimer] = useState(moment.duration(0));
   const [subTasks, setSubTasks] = useState(null);
@@ -62,7 +64,8 @@ const IndividualMainTask = ({navigation}) => {
     }
   }
   const router = useRoute();
-  const {task} = router.params;
+  const {task, points} = router.params;
+  if (points != undefined) setPointsModalOpen(true);
   const createdBy = task.createdBy;
 
   const showToast = (text1, text2, type) => {
@@ -198,7 +201,7 @@ const IndividualMainTask = ({navigation}) => {
       };
       try {
         const response = await axios.post(
-          `https://deardiary-backend.onrender.com/api/v1/tasks/${task.createdBy}/main-tasks/${task._id}/sub-tasks`,
+          `http://192.168.1.16:5000/api/v1/tasks/${task.createdBy}/main-tasks/${task._id}/sub-tasks`,
           subTask,
         );
         console.log(response.data);
@@ -361,7 +364,7 @@ const IndividualMainTask = ({navigation}) => {
     try {
       if (!fetchedSubTasks) {
         console.log('reached here-2');
-        const url = `https://deardiary-backend.onrender.com/api/v1/tasks/${task.createdBy}/main-tasks/${task._id}/sub-tasks`;
+        const url = `https://tame-rose-monkey-suit.cyclic.app/api/v1/tasks/${task.createdBy}/main-tasks/${task._id}/sub-tasks`;
         console.log(url);
         const response = await axios.get(url);
         console.log('requested..!');
@@ -426,17 +429,20 @@ const IndividualMainTask = ({navigation}) => {
               <LeftArrow width={50} height={50} />
             </TouchableOpacity>
             <Text style={styles.taskTitle}>Main Task</Text>
-            <View
+            <TouchableOpacity
               style={{
                 borderRadius: 50,
                 backgroundColor: '#000',
                 position: 'relative',
                 justifyContent: 'center',
                 alignItems: 'center',
+              }}
+              onPress={() => {
+                setPointsModalOpen(true);
               }}>
               <FireIcon width={50} height={50} />
               <Text style={styles.firePoints}>{task.points}</Text>
-            </View>
+            </TouchableOpacity>
           </View>
           <View style={styles.taskDetails}>
             <Text style={styles.taskTitle}>{task.title}</Text>
@@ -503,7 +509,7 @@ const IndividualMainTask = ({navigation}) => {
               <Text
                 style={{
                   fontFamily: 'OpenSans-Medium',
-                  fontSize: 16,
+                  fontSize: 14,
                   color:
                     moment(task.deadline)
                       .add(1, 'day')
@@ -633,7 +639,7 @@ const IndividualMainTask = ({navigation}) => {
                   } else {
                     color = colors.themeLightGreen;
                   }
-                  console.log(thisTask)
+                  console.log(thisTask);
                   return (
                     <View
                       style={[
@@ -649,7 +655,7 @@ const IndividualMainTask = ({navigation}) => {
                         style={{
                           flexDirection: 'row',
                           position: 'absolute',
-                          width:`${thisTask.percentageWorked+10}%`,
+                          width: `${thisTask.percentageWorked + 10}%`,
                           height: 150,
                           borderRadius: 20,
                           backgroundColor: color,
@@ -1044,6 +1050,13 @@ const IndividualMainTask = ({navigation}) => {
               </View>
             </Modal>
           </View>
+          {points && (
+            <PopUpModal
+              modalVisible={pointsModalOpen}
+              setModalVisible={setPointsModalOpen}
+              points={points}
+            />
+          )}
         </ScrollView>
       </GestureHandlerRootView>
       {moment(task.deadline).add(1, 'day').diff(moment(), 'days') >= 0 && (

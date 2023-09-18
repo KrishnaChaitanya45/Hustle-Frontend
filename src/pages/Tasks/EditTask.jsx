@@ -144,7 +144,7 @@ const EditTask = ({navigation}) => {
         try {
           console.log('request sent');
           const response = await axios.patch(
-            `https://deardiary-backend.onrender.com/api/v1/tasks/${userId}/main-tasks/${task._id}`,
+            `https://tame-rose-monkey-suit.cyclic.app/api/v1/tasks/${userId}/main-tasks/${task._id}`,
             body,
           );
           dispatch(updateSingleTask(response.data.task));

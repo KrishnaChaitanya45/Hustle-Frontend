@@ -204,7 +204,7 @@ const EditProfile = ({navigation}) => {
         console.log('request sent');
 
         const response = await axios.patch(
-          `https://deardiary-backend.onrender.com/api/v1/auth/update/${userData._id}`,
+          `https://tame-rose-monkey-suit.cyclic.app/api/v1/auth/update/${userData._id}`,
 
           body,
           {

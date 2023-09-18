@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "472317099948",
+    "project_id": "hustle-6ff85",
+    "storage_bucket": "hustle-6ff85.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:472317099948:android:0c978b1fb9c0e9b1258409",
+        "android_client_info": {
+          "package_name": "com.randomone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "472317099948-o2o416rn16f59lvpe7qpbu6k0mg4u8op.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.randomone",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "472317099948-fikq4a9gfsetpa0dqtirknhmhriavk75.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAai7rRoRbwx3AbkRtrWvxhmdrX9DGPWBs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "472317099948-fikq4a9gfsetpa0dqtirknhmhriavk75.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

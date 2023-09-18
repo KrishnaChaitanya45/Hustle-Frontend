@@ -32,10 +32,12 @@ import PremiumIcon from '../../../assets/icons/star.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Toast} from 'react-native-toast-message/lib/src/Toast';
 import {useRoute} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
 const {width, height} = Dimensions.get('screen');
 const UserProfile = ({navigation}) => {
   //DashBoard Option
   const [userData, setUserData] = useState(null);
+  const userDataFetched = useSelector(state => state.user.user);
   const showToast = (text1, text2, type) => {
     Toast.show({
       text1: text1,
@@ -53,22 +55,22 @@ const UserProfile = ({navigation}) => {
     try {
       const id = user._id;
       const response = await axios.get(
-        `https://deardiary-backend.onrender.com/api/v1/tasks/${id}/main-tasks`,
+        `https://tame-rose-monkey-suit.cyclic.app/api/v1/tasks/${id}/main-tasks`,
       );
     } catch (error) {}
   };
   const user = async () => {
-    if (router.params) {
-      console.log(router.params);
-      return setUserData(router.params);
+    if (userDataFetched) {
+      console.log(userDataFetched);
+      return setUserData(userDataFetched);
     } else {
-      if (!userData) {
+      if (!userDataFetched) {
         try {
           const cookie = await AsyncStorage.getItem('deardiary');
           try {
             console.log('FETCH REQUEST SENT');
             const response = await fetch(
-              `https://deardiary-backend.onrender.com/api/v1/auth/login/user-details/${cookie}`,
+              `http://192.168.1.16:5000/api/v1/auth/login/user-details/${cookie}`,
               {
                 method: 'GET',
 
@@ -80,6 +82,9 @@ const UserProfile = ({navigation}) => {
 
             const data = await response.json();
             console.log('=== DATA FETCHED ===', data);
+            if (!data.user) {
+              throw new Error('User Not Found..!');
+            }
             setUserData(data.user);
           } catch (error) {
             showToast(
@@ -88,6 +93,7 @@ const UserProfile = ({navigation}) => {
               'error',
             );
             console.log(error);
+            // navigation.navigate('login');
           }
         } catch (error) {
           showToast(
@@ -162,11 +168,13 @@ const UserProfile = ({navigation}) => {
             </ScrollView>
           </View>
           <View style={styles.settingsContainer}>
-            <View style={styles.indOption}>
+            <TouchableOpacity
+              style={styles.indOption}
+              onPress={() => navigation.navigate('dashboard')}>
               <Dashboard width={40} height={40} style={styles.indIcon} />
               <Text style={styles.indOption_text}>Dashboard ✨</Text>
               <RightIcon width={30} height={30} style={styles.rightIcon} />
-            </View>
+            </TouchableOpacity>
             <TouchableOpacity
               style={[styles.indOption]}
               onPress={() => {
@@ -192,7 +200,7 @@ const UserProfile = ({navigation}) => {
         <View style={styles.ErrorPage}>
           <Lottie source={personRunning} autoPlay loop />
           <TouchableOpacity onPress={() => navigation.navigate('register')}>
-            <Text style={styles.ErrorText}>Try Again</Text>
+            <Text style={styles.ErrorText}>Fetching Your Details..!</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -224,7 +232,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     width: '100%',
     height: '20%',
-    overflow:"hidden",
+    overflow: 'hidden',
     flexDirection: 'row',
     justifyContent: 'space-around',
     backgroundColor: themeBlack,
@@ -331,15 +339,23 @@ const styles = StyleSheet.create({
     color: colors.themePurple,
   },
   ErrorPage: {
-    flex: 1,
-    backgroundColor: colors.themeBlack,
+    height: '100%',
+    padding: '10%',
     alignItems: 'center',
+    backgroundColor: colors.themeBlack,
     justifyContent: 'center',
+  },
+  animationLoadingCharacter: {
+    width: width,
+    height: height / 2,
+    position: 'absolute',
+    top: '10%',
   },
   ErrorText: {
     fontFamily: 'Poppins-Bold',
     fontSize: 20,
-    color: colors.themeYellow,
+    transform: [{translateY: 200}],
+    color: colors.themeWhite,
   },
   ErrorTextMessage: {
     fontFamily: 'Lato-Medium',

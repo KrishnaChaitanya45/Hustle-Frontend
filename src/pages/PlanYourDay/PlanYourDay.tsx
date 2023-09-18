@@ -24,79 +24,151 @@ const PlanYourDay = ({navigation}: {navigation: any}) => {
   const tasksData = [
     {
       id: Math.random().toString(),
+      time: '1:00 AM',
+      tasks: [],
+      habits: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '2:00 AM',
+      tasks: [],
+      habits: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '3:00 AM',
+      tasks: [],
+      habits: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '4:00 AM',
+      tasks: [],
+      habits: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '5:00 AM',
+      tasks: [],
+      habits: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '6:00 AM',
+      tasks: [],
+      habits: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '7:00 AM',
+      tasks: [],
+      habits: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '8:00 AM',
+      tasks: [],
+      habits: [],
+    },
+    {
+      id: Math.random().toString(),
+      time: '9:00 AM',
+      tasks: [],
+      habits: [],
+    },
+    {
+      id: Math.random().toString(),
       time: '10:00 AM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '11:00 AM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '12:00 AM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '1:00 PM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '2:00 PM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '3:00 PM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '4:00 PM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '5:00 PM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '6:00 PM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '7:00 PM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '8:00 PM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '9:00 PM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '10:00 PM',
       tasks: [],
+      habits: [],
     },
     {
       id: Math.random().toString(),
       time: '11:00 PM',
       tasks: [],
+      habits: [],
     },
   ];
   const {tasks} = useSelector((state: any) => state.tasks);
   const [data, setData] = useState(tasksData);
 
+  const fetchedHabits = useSelector((state: any) => state.tasks.habits);
+  // console.log('=== FETCHED HABITS ===', fetchedHabits);
+
   const fetchSelectedDateData = async (date: moment.Moment) => {
+    let day;
     try {
       const taskdata = await tasks.filter((task: any) => {
         const startDate = task.start;
@@ -106,10 +178,79 @@ const PlanYourDay = ({navigation}: {navigation: any}) => {
         const selectedDate = moment()
           .set('date', selectedDateDay)
           .set('month', currentActiveMonth);
-
+        day = moment(selectedDate).day();
+        console.log('=== SELECTED DAY ===', day);
         const isBetween = moment(selectedDate).isBetween(startDate, endDate);
 
         return isBetween;
+      });
+      let habitsToWorkOn = [];
+      fetchedHabits.map((habit: any) => {
+        const habitDays = habit.weeksSelected;
+        //HABITS DATES WEEK
+        const days = [
+          'Sunday',
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+        ];
+        // console.log('=== HABIT DAYS ===', habitDays);
+        // console.log('=== HABIT CONSTANT DAYS ===', days);
+        if (habitDays.indexOf(days[Number(day)]) !== -1) {
+          // console.log('=== HABIT TODAY ===', habit);
+          habitsToWorkOn.push(habit);
+        }
+      });
+      console.log('=== HABITS TO WORK ON ===', habitsToWorkOn);
+      habitsToWorkOn.map((habit: any) => {
+        const id = habit._id;
+        const title = habit.title;
+        const description = habit.description;
+        const time = habit.startTime.displayTime;
+        const habitIcon = habit.habitIcon;
+        const fullTime =
+          moment(time, 'hh:mm a').hours() > 12
+            ? `${moment(time, 'hh:mm a').hours() - 12}:00 PM`
+            : `${moment(time, 'hh:mm a').hours()}:00 AM`;
+        const durationInSeconds = moment(habit.endTime.toCalculate).diff(
+          moment(habit.startTime.toCalculate),
+          'seconds',
+        );
+        const hours =
+          Math.floor(Math.floor(durationInSeconds / 60) / 60) > 0
+            ? Math.floor(Math.floor(durationInSeconds / 60) / 60)
+            : 0;
+        const minutes =
+          Math.floor(Math.floor(durationInSeconds / 60) % 60) > 0
+            ? Math.floor(Math.floor(durationInSeconds / 60) % 60)
+            : 0;
+        const seconds = durationInSeconds % 60;
+        const duration = `${hours}:${minutes}:${seconds}`;
+
+        setData((prevData: any) => {
+          const newData = JSON.parse(JSON.stringify(prevData));
+          const index = newData.findIndex((item: any) => {
+            console.log('=== ITEM TIME ===', item.time);
+            console.log('== FULL TIME ===', fullTime);
+            return item.time === fullTime;
+          });
+          console.log('index', index);
+          if (index >= 0) {
+            console.log('taskfound');
+            newData[index].habits.push({
+              id,
+              title,
+              description,
+              icon: habitIcon,
+              time,
+              duration,
+            });
+          }
+          return newData;
+        });
       });
       console.log('=== taskdata ===', taskdata);
       const formattedData = taskdata.map((task: any) => {
@@ -117,6 +258,7 @@ const PlanYourDay = ({navigation}: {navigation: any}) => {
         const title = task.title;
         const description = task.description;
         const time = task.startTime.displayTime;
+
         const fullTime =
           moment(time, 'hh:mm a').hours() > 12
             ? `${moment(time, 'hh:mm a').hours() - 12}:00 PM`
@@ -148,9 +290,11 @@ const PlanYourDay = ({navigation}: {navigation: any}) => {
         const isStarted = task.status === 'working' ? true : false;
         setData((prevData: any) => {
           const newData = [...prevData];
-          const index = newData.findIndex(
-            (item: any) => item.time === fullTime,
-          );
+          const index = newData.findIndex((item: any) => {
+            console.log(item.time);
+            console.log(fullTime);
+            return item.time === fullTime;
+          });
           console.log('index', index);
           if (index >= 0) {
             console.log('taskfound');

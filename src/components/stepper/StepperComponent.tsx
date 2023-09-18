@@ -1,4 +1,13 @@
-import {StyleSheet, Text, View, ScrollView, Dimensions, Button} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ScrollView,
+  Image,
+  Dimensions,
+  Button,
+} from 'react-native';
 import React from 'react';
 import {
   themeBlack,
@@ -8,21 +17,24 @@ import {
   themeLightWhite,
   themeLightYellow,
   themeWhite,
+  themeYellow,
 } from '../../utils/colors';
 import RightArrow from '../../../assets/icons/right-arrow.svg';
 import DoneIcon from '../../../assets/icons/check-circle.svg';
 //@ts-ignore
 import ClockIcon from '../../../assets/icons/clocktask.svg';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import { useSelector } from 'react-redux';
-
+import {useSelector} from 'react-redux';
+import moment from 'moment';
 const {width, height} = Dimensions.get('window');
 const StepperComponent = ({data, navigation}: {data: any; navigation: any}) => {
   const linesHeight = data ? data.length * (height * 0.2) : 0;
   const cardsHeight = data
-    ? data.map((item: any) => item.tasks.length * 70 + 10)
+    ? data.map(
+        (item: any) => item.tasks.length * 70 + item.habits.length * 70 + 10,
+      )
     : 100;
-const AllTasks = useSelector((state: any) => state.tasks);
+  const AllTasks = useSelector((state: any) => state.tasks);
+  const AllHabits = useSelector((state: any) => state.tasks.habits);
   const totalContainerHeight =
     linesHeight + cardsHeight.reduce((a: any, b: any) => a + b, 0);
   console.log(totalContainerHeight);
@@ -65,8 +77,10 @@ const AllTasks = useSelector((state: any) => state.tasks);
                     {item.tasks &&
                       item.tasks.map((item: any, index: any) => {
                         // console.log(item.duration);
-                        const task = AllTasks.tasks.find((task: any) => task.title === item.title);
-                        
+                        const task = AllTasks.tasks.find(
+                          (task: any) => task.title === item.title,
+                        );
+
                         return (
                           <TouchableOpacity
                             style={[
@@ -77,7 +91,10 @@ const AllTasks = useSelector((state: any) => state.tasks);
                                   : themeLightWhite,
                               },
                             ]}
-                            key={index}>
+                            key={index}
+                            onPress={() => {
+                              navigation.navigate('ind-task', {task: task});
+                            }}>
                             <View style={styles.headingAndTime}>
                               <Text style={styles.TaskHeading}>
                                 {item.title.slice(0, 10)}...
@@ -93,14 +110,62 @@ const AllTasks = useSelector((state: any) => state.tasks);
                             {/* <View style={{position:"absolute", top:-10, zIndex:100 }}>
                            <DoneIcon style={{width:50 , height:50}}  />
                            </View> */}
-                            <View style={{flexDirection:'row', justifyContent:"space-between"}}>
-                            <Text style={styles.TaskDescription}>
-                              {item.description.slice(0, 40)}...
-                            </Text>
-                            <Button title="Go" onPress={()=>  navigation.navigate('ind-task', {task: task})} />
-                    
-                            {/* </Button> */}
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                              }}>
+                              <Text style={styles.TaskDescription}>
+                                {item.description.slice(0, 40)}...
+                              </Text>
+
+                              {/* </Button> */}
                             </View>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    {item.habits &&
+                      item.habits.map((item: any, index: any) => {
+                        // console.log(item.duration);
+                        const task = AllHabits.find(
+                          (task: any) => task.title === item.title,
+                        );
+
+                        return (
+                          <TouchableOpacity
+                            style={[
+                              styles.indTaskCard,
+                              {
+                                backgroundColor: themeLightYellow,
+                                position: 'relative',
+                              },
+                            ]}
+                            onPress={() => {
+                              navigation.navigate('ind-habit', {habit: task});
+                            }}
+                            key={index}>
+                            <View style={styles.headingAndTime}>
+                              <Text style={styles.TaskHeading}>
+                                {item.title.slice(0, 10)}...
+                              </Text>
+                              <View style={styles.TaskTime}>
+                                <Image
+                                  source={{uri: item.icon}}
+                                  style={{
+                                    width: 50,
+                                    height: 50,
+                                    borderRadius: 50,
+                                    resizeMode: 'stretch',
+                                    backgroundColor: themeYellow,
+                                    // transform: [{translateX: -10}],
+                                  }}
+                                />
+                              </View>
+                            </View>
+                            {/* //TODO Add the done mark */}
+                            {/* <View style={{position:"absolute", top:-10, zIndex:100 }}>
+                           <DoneIcon style={{width:50 , height:50}}  />
+                           </View> */}
                           </TouchableOpacity>
                         );
                       })}
@@ -150,7 +215,6 @@ const styles = StyleSheet.create({
   stepContainer: {
     flexDirection: 'column',
     alignItems: 'flex-start',
-
 
     width: '100%',
     padding: 10,
@@ -220,13 +284,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    zIndex:5,
+    // transform: [{translateY: -10}],
+    zIndex: 5,
   },
   TaskTimeText: {
     fontSize: 10,
     color: themeBlack,
     fontFamily: 'Poppins-Medium',
-    zIndex:5,
+    zIndex: 5,
   },
   TaskHeading: {
     fontSize: 15,

@@ -28,6 +28,7 @@ import DeleteIcon from '../../../assets/icons/delete.svg';
 import {useRoute} from '@react-navigation/native';
 import axios from 'axios';
 import {addTask} from '../../features/Tasks/TasksSlice';
+import PopUpModal from '../../components/modal/Modal';
 // import Animated, {
 //   useAnimatedGestureHandler,
 //   useAnimatedStyle,
@@ -55,18 +56,23 @@ const AllTasks = ({navigation}) => {
   const {user} = useSelector(state => state.user);
   const [Tasks, setTasks] = useState(null);
   const router = useRoute();
-  const {reload, fetch} = router.params;
+  const {reload, fetch, points} = router.params;
   const [fetched, setFetched] = useState(fetch);
   if (reload) {
     fetchMainTasks();
   }
-
+  const [pointsModalOpen, setPointsModalOpen] = useState(false);
+  useEffect(() => {
+    if (!pointsModalOpen) {
+      setPointsModalOpen(true);
+    }
+  }, [points]);
   async function fetchMainTasks() {
     console.log('FETCHED VALUE ===', !fetched);
     console.log('=== USERID ===', user._id);
     if (!fetched) {
       console.log('=== FETCHING MAIN TASKS ===');
-      const url = `https://deardiary-backend.onrender.com/api/v1/tasks/${user._id}/main-tasks`;
+      const url = `https://tame-rose-monkey-suit.cyclic.app/api/v1/tasks/${user._id}/main-tasks`;
       console.log('=== URL ===', url);
       try {
         const {data} = await axios.get(url);
@@ -153,7 +159,7 @@ const AllTasks = ({navigation}) => {
     try {
       console.log('DELETE REQUEST SENT');
       const response = await axios.delete(
-        `https://deardiary-backend.onrender.com/api/v1/tasks/${user._id}/main-tasks/${task._id}`,
+        `https://tame-rose-monkey-suit.cyclic.app/api/v1/tasks/${user._id}/main-tasks/${task._id}`,
       );
       console.log('DELETE REQUEST DONE');
       if (response.status === 200) {
@@ -364,7 +370,7 @@ const AllTasks = ({navigation}) => {
               );
               return (
                 <Swipeable
-                  renderLeftActions={() => {
+                  renderLeftActions={(progress, dragX) => {
                     return (
                       <TouchableOpacity
                         style={{
@@ -514,6 +520,13 @@ const AllTasks = ({navigation}) => {
           )}
         </ScrollView>
       </ScrollView>
+      {points && (
+        <PopUpModal
+          modalVisible={pointsModalOpen}
+          setModalVisible={setPointsModalOpen}
+          points={points}
+        />
+      )}
     </GestureHandlerRootView>
   );
 };

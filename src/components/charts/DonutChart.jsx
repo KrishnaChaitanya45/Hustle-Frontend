@@ -4,6 +4,7 @@ import Svg, {G, Circle} from 'react-native-svg';
 const DonutChart = ({
   percentage,
   radius,
+  children,
   strokeWidth = 10,
   color,
   delay = 700,
@@ -70,50 +71,24 @@ const DonutChart = ({
           />
         </G>
       </Svg>
-      {image && (
-        <Image
-          source={image}
-          width={radius * 1.25}
-          height={radius * 1.25}
-          resizeMode="cover"
-          style={[
-            {
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              transform: [
-                {translateX: (radius / 1.5) * 0.5},
-                {translateY: (radius / 1.5) * 0.5},
-              ],
-              borderRadius: 100,
-            },
-          ]}
-        />
-      )}
-      {text && (
-        <Text
-          style={[
-            {
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              textAlign: 'center',
-              textAlignVertical: 'center',
-              fontSize: radius / 3,
-              transform: [
-                {translateX: (radius / 10) * 0.5},
-                {translateY: (radius / 15) * 0.1},
-              ],
-              color: color ? color : 'tomato',
-            },
-          ]}>
-          {text > 0 ? text : 0} %
-        </Text>
-      )}
+
+      <View
+        style={[
+          {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            transform: [
+              {translateX: (radius / 1.5) * 0.5},
+              {translateY: (radius / 1.5) * 0.5},
+            ],
+            borderRadius: 100,
+          },
+        ]}>
+        {children}
+      </View>
     </View>
   );
 };

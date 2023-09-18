@@ -36,7 +36,7 @@ import React, {useRef, useState} from 'react';
 import RegisterSVG from '../../../assets/images/SignUp.svg';
 import Toast from 'react-native-toast-message';
 import {TextInput, Image, Animated, Keyboard} from 'react-native-paper';
-import { themeBlue } from '../../utils/colors';
+import {themeBlue} from '../../utils/colors';
 const Register = ({navigation}) => {
   const {width, height} = Dimensions.get('screen');
   const [name, setName] = useState('');
@@ -171,7 +171,7 @@ const Register = ({navigation}) => {
                 marginTop: 50,
                 marginBottom: 20,
                 fontSize: 35,
-                fontFamily:"Poppins-Medium"
+                fontFamily: 'Poppins-Medium',
               }}>
               Register 🙌
             </Text>
@@ -280,15 +280,17 @@ const Register = ({navigation}) => {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <Text style={{ fontSize: 16, fontFamily:"Montserrat"}}>
+          <Text style={{fontSize: 16, fontFamily: 'Montserrat'}}>
             Already have an Account?
           </Text>
           <TouchableOpacity
-              style={{backgroundColor: themeBlue, padding: 7.5, borderRadius: 10}}
-                onPress={nextHandler}
-              >
-                <Text style={{ fontSize:14, fontFamily: 'Poppins-Medium'}}> Login </Text>
-                </TouchableOpacity>
+            style={{backgroundColor: themeBlue, padding: 7.5, borderRadius: 10}}
+            onPress={() => navigation.navigate('login')}>
+            <Text style={{fontSize: 14, fontFamily: 'Poppins-Medium'}}>
+              {' '}
+              Login{' '}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ScrollView>

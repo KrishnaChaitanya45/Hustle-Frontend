@@ -17,6 +17,7 @@ import {TextInput, Image, Animated, Keyboard} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import personRunning from '../../../assets/videos/man-running.json';
 import colors from '../../utils/colors';
+import {useSelector} from 'react-redux';
 const Login = ({navigation}) => {
   const {width, height} = Dimensions.get('screen');
   const [email, setEmail] = useState('');
@@ -26,6 +27,7 @@ const Login = ({navigation}) => {
   const [passwordError, setPasswordError] = useState(false);
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const deviceToken = useSelector(state => state.socket.deviceToken);
   const showToast = (text1, text2, type) => {
     Toast.show({
       text1: text1,
@@ -60,15 +62,17 @@ const Login = ({navigation}) => {
       setLoading(true);
       const body = {
         email: validemail,
+        fcm_token: deviceToken,
         password: validpassword,
       };
       console.log(body);
       try {
         console.log('requested');
         const {data} = await axios.post(
-          'https://deardiary-backend.onrender.com/api/v1/auth/login',
+          'http://192.168.1.16:5000/api/v1/auth/login',
           body,
         );
+        console.log('RESPONSE RECEIVED', data);
         setUser(data.user);
         setToken(data.token);
         await AsyncStorage.setItem('deardiary', data.token);
@@ -80,7 +84,13 @@ const Login = ({navigation}) => {
           setLoading(false);
         }
       } catch (error) {
-        console.log(error);
+        showToast(
+          'Invalid Credentials Provided..!😢',
+          'Try Again..! 👍',
+          'error',
+        );
+        // navigation.goBack();
+        setLoading(false);
       }
     }
   };
@@ -133,7 +143,7 @@ const Login = ({navigation}) => {
                     marginTop: 50,
                     marginBottom: 20,
                     fontSize: 35,
-                    fontFamily:"Poppins-Bold"
+                    fontFamily: 'Poppins-Bold',
                   }}>
                   Login 🚀
                 </Text>
@@ -153,7 +163,7 @@ const Login = ({navigation}) => {
                     outlineColor={emailError ? 'red' : 'black'}
                     onChangeText={text => setEmail(text)}
                     activeUnderlineColor={emailError ? 'red' : 'black'}
-                    value={email ? email : ""}
+                    value={email ? email : ''}
                   />
                   <TextInput
                     label="Password"
@@ -187,7 +197,11 @@ const Login = ({navigation}) => {
                       style={{backgroundColor: 'black'}}
                       onPress={submitHandler}>
                       <Text
-                        style={{fontSize: 18, color: '#fff', fontFamily:"Poppins-Medium"}}>
+                        style={{
+                          fontSize: 18,
+                          color: '#fff',
+                          fontFamily: 'Poppins-Medium',
+                        }}>
                         Submit 👍
                       </Text>
                     </TouchableOpacity>
@@ -208,11 +222,17 @@ const Login = ({navigation}) => {
                 Don't have an Account?
               </Text>
               <TouchableOpacity
-              style={{backgroundColor: 'black', padding: 7.5, borderRadius: 10}}
-                onPress={() => navigation.navigate('register')}
-              >
-                <Text style={{ fontSize:14, fontFamily: 'Poppins-Medium'}}> Register </Text>
-                </TouchableOpacity>
+                style={{
+                  backgroundColor: 'black',
+                  padding: 7.5,
+                  borderRadius: 10,
+                }}
+                onPress={() => navigation.navigate('register')}>
+                <Text style={{fontSize: 14, fontFamily: 'Poppins-Medium'}}>
+                  {' '}
+                  Register{' '}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>

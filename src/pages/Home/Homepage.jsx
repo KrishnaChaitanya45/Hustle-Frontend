@@ -7,11 +7,12 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import TabContainer from '../../components/Tab/TabContainer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import colors from '../../utils/colors';
+import colors, {themeGrey} from '../../utils/colors';
 import personRunning from '../../../assets/videos/man-running.json';
 import Lottie from 'lottie-react-native';
 import AngelCIcon from '../../../assets/icons/angel.svg';
@@ -21,41 +22,86 @@ import RightArrow from '../../../assets/icons/right-arrow.svg';
 import LinearGradient from 'react-native-linear-gradient';
 import DonutChart from '../../components/charts/DonutChart';
 import moment from 'moment';
-import {addTask, addTodaysTask} from '../../features/Tasks/TasksSlice';
-import {addUser} from '../../features/users/UserSlice';
+import {io} from 'socket.io-client';
+import {
+  addGroupChats,
+  addMessagesSocket,
+  addPersonalChats,
+  addUserSocket,
+} from '../../features/Socket/SocketSlice';
+import {
+  addHabits,
+  addTask,
+  addTodaysTask,
+} from '../../features/Tasks/TasksSlice';
+import {addFriends, addUser} from '../../features/users/UserSlice';
 const {width, height} = Dimensions.get('window');
 const Homepage = ({navigation}) => {
   const [userData, setUserData] = useState(null);
   const {tasks} = useSelector(state => state.tasks);
   const {user} = useSelector(state => state.user);
+  const [habits, setHabits] = useState(null);
+  const [habitsLoading, setHabitsLoading] = useState(null);
   const [workingTasks, setWorkingTasks] = useState(null);
   const [todaysTasks, setTodaysTasks] = useState(null);
   const [LoadingWorkingTasks, setLoadingWorkingTasks] = useState(false);
   const [LoadingTodaysTasks, setLoadingTodaysTasks] = useState(false);
+  const token = useSelector(state => state.socket.deviceToken);
   const [Loading, setLoading] = useState(true);
   let message = {
     title: 'Fetching Tasks..!',
     description: 'We are glad to have you here, please wait..!',
   };
   const dispatch = useDispatch();
+  const fetchFriends = async () => {
+    console.log('================= FETCHING FRIENDS ===================');
+    try {
+      const response = await axios.get(
+        `https://tame-rose-monkey-suit.cyclic.app/api/v1/user/friends/${userData._id}`,
+      );
+      console.log('RESPONSE', response);
+      if (response.status == 200 || response.status == 201) {
+        dispatch(addFriends(response.data.friends));
+        console.log('=== FETCHED FRIENDS ===', response.data);
+      } else {
+        throw new Error('Error fetching friends');
+      }
+    } catch (error) {
+      console.log('=== ERROR FETCHING FRIENDS ===', error);
+    }
+  };
+  const fetchGroupChats = async () => {
+    try {
+      console.log('REQUEST SENT');
+      const response = await axios.get(
+        `https://tame-rose-monkey-suit.cyclic.app/api/v1/chat/${userData._id}?onlyGroup=true`,
+      );
+      if (response.status == 200 || response.status == 201) {
+        dispatch(addGroupChats(response.data));
+        console.log('=== FETCHED GROUP CHATS ===', response.data);
+      } else {
+        throw new Error('Error fetching group chats');
+      }
+    } catch (error) {
+      console.log('REQUEST FAILED');
+    }
+  };
   const getUserDetails = async () => {
     try {
       console.log('TRIED TO FETCH COOKIE');
       const cookie = await AsyncStorage.getItem('deardiary');
       console.log(cookie);
       // console.log(cookie);
+      let url = `http://192.168.1.16:5000/api/v1/auth/login/user-details/${cookie}/${token}`;
+      console.log(url);
       try {
-        const response = await fetch(
-          `https://deardiary-backend.onrender.com/api/v1/auth/login/user-details/${cookie}`,
-          {
-            method: 'GET',
+        const response = await fetch(url, {
+          method: 'GET',
 
-            headers: {
-              'Content-Type': 'application/json',
-            },
+          headers: {
+            'Content-Type': 'application/json',
           },
-        );
-
+        });
         const data = await response.json();
         console.log(data.user);
         setUserData(data.user);
@@ -86,7 +132,7 @@ const Homepage = ({navigation}) => {
     if (tasks.length === 0) {
       try {
         const response = await fetch(
-          `https://deardiary-backend.onrender.com/api/v1/tasks/${userId}/main-tasks`,
+          `https://tame-rose-monkey-suit.cyclic.app/api/v1/tasks/${userId}/main-tasks`,
           {
             method: 'GET',
             headers: {
@@ -101,7 +147,7 @@ const Homepage = ({navigation}) => {
         if (data.tasks.length === 0) {
           message = {
             title: 'No Tasks Found',
-            description: 'You have no tasks to work on, please add some tasks',
+            description: 'Add some tasks to work on..!',
           };
         }
       } catch (err) {
@@ -115,12 +161,31 @@ const Homepage = ({navigation}) => {
       setWorkingTasks(workingTasksFromTasks);
     }
   };
+  const fetchHabits = async () => {
+    const userId = userData._id;
+    const url = `https://tame-rose-monkey-suit.cyclic.app/api/v1/user/habits/${userId}`;
+    console.log(url);
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+
+      setHabits(data.habits);
+      dispatch(addHabits(data.habits));
+    } catch (error) {
+      console.log('=== ERROR ===');
+    }
+  };
   const fetchTodaysTasks = async () => {
     const userId = userData._id;
 
     const today = moment(moment().format('YYYY-MM-DD')).toISOString();
     console.log(today);
-    const url = `https://deardiary-backend.onrender.com/api/v1/tasks/${userId}/main-tasks?todaysTasks`;
+    const url = `https://tame-rose-monkey-suit.cyclic.app/api/v1/tasks/${userId}/main-tasks?todaysTasks`;
     console.log(url);
     try {
       const response = await fetch(url, {
@@ -137,10 +202,37 @@ const Homepage = ({navigation}) => {
       console.log('tasks fetch request error');
     }
   };
+  const addSockets = async () => {
+    let userSocket = io('https://tame-rose-monkey-suit.cyclic.app/users', {
+      transports: ['websocket'],
+      reconnection: true,
+      auth: {
+        userId: userData._id,
+      },
+      reconnectionAttempts: 2,
+    });
+  };
+  const fetchOneToOneChats = async () => {
+    try {
+      console.log('REQUEST SENT');
+
+      const response = await axios.get(
+        `https://tame-rose-monkey-suit.cyclic.app/api/v1/chat/${userData._id}?onlyPersonal=true`,
+      );
+      if (response.status == 200 || response.status == 201) {
+        dispatch(addPersonalChats(response.data));
+        console.log('=== FETCHED PERSONAL CHATS ===', response.data);
+      } else {
+        throw new Error('Error fetching group chats');
+      }
+    } catch (error) {
+      console.log('REQUEST FAILED OnE TO OnE CHATS', error);
+    }
+  };
   useEffect(() => {
     console.log('==== Initial Loading =====');
     setLoading(true);
-    if (!userData) {
+    if (!userData && token) {
       console.log('fetched user');
       getUserDetails();
       console.log('done');
@@ -148,16 +240,24 @@ const Homepage = ({navigation}) => {
     console.log('fetched');
     setLoading(false);
     if (userData) {
+      addSockets();
+      fetchGroupChats();
+      fetchOneToOneChats();
+
+      fetchFriends();
       setLoadingWorkingTasks(true);
       fetchWorkingTasks();
       setLoadingWorkingTasks(false);
       setLoadingTodaysTasks(true);
       fetchTodaysTasks();
       setLoadingTodaysTasks(false);
+      setHabitsLoading(true);
+      fetchHabits();
+      setHabitsLoading(false);
       setLoading(false);
     }
-  }, [userData]);
-  console.log("=== USER FETCHED ===", userData);
+  }, [userData, token]);
+
   return (
     <TabContainer>
       {userData && !Loading ? (
@@ -166,8 +266,13 @@ const Homepage = ({navigation}) => {
             <View style={{justifyContent: 'center'}}>
               <Text style={styles.uppertext}>Hi {userData.name}</Text>
               <Text style={styles.lowertext}>
-                {userData.assignedTasks.length - userData.completedTasks.length > 0
-                  ? `You have ${userData.assignedTasks.length - userData.completedTasks.length} pending tasks 😢 `
+                {userData.assignedTasks.length -
+                  userData.completedTasks.length >
+                0
+                  ? `You have ${
+                      userData.assignedTasks.length -
+                      userData.completedTasks.length
+                    } pending tasks 😢 `
                   : `You have no pending tasks😇`}
               </Text>
             </View>
@@ -309,7 +414,7 @@ const Homepage = ({navigation}) => {
                 width: '100%',
               }}>
               <Text style={styles.subHeader}>My Habits</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('tasks')}>
+              <TouchableOpacity onPress={() => navigation.navigate('habits')}>
                 <RightArrow width={30} height={30} />
               </TouchableOpacity>
             </View>
@@ -322,7 +427,70 @@ const Homepage = ({navigation}) => {
                 alignItems: 'center',
               }}
               horizontal>
-              <DonutChart percentage={75} radius={50} />
+              {!habitsLoading && habits && habits.length > 0 ? (
+                habits.map((_, index) => {
+                  let percentage = 0;
+                  let percentageExits = _.dates.find(i => {
+                    return (
+                      moment(i.date).format('DD-MM-YYYY') ==
+                      moment().format('DD-MM-YYYY')
+                    );
+                  });
+                  if (percentageExits) {
+                    percentage = percentageExits.percentage;
+                  }
+                  return (
+                    <DonutChart percentage={percentage} radius={55} key={index}>
+                      <Image
+                        source={{uri: _.habitIcon}}
+                        style={{
+                          width: 75,
+                          height: 75,
+                          borderRadius: 50,
+                        }}
+                      />
+                    </DonutChart>
+                  );
+                })
+              ) : !habitsLoading ? (
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: width * 0.7,
+                    backgroundColor: themeGrey,
+                    borderRadius: 10,
+                    height: height / 10,
+                  }}>
+                  <Text
+                    style={{
+                      color: colors.themeWhite,
+                      fontSize: 20,
+                      fontFamily: 'Montserrat-Bold',
+                    }}>
+                    No Habits Found
+                  </Text>
+                </View>
+              ) : (
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: width * 0.7,
+                    backgroundColor: themeGrey,
+                    borderRadius: 10,
+                    height: height / 10,
+                  }}>
+                  <Text
+                    style={{
+                      color: colors.themeWhite,
+                      fontSize: 20,
+                      fontFamily: 'Montserrat-Bold',
+                    }}>
+                    Fetching Habits
+                  </Text>
+                </View>
+              )}
             </ScrollView>
           </View>
           {/* //TODO render tasks which are due today and they should not be more  than 3 */}
@@ -340,12 +508,12 @@ const Homepage = ({navigation}) => {
                 width: '100%',
               }}>
               <Text style={styles.subHeader}>Todays Tasks</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('tasks')}>
+              {/* <TouchableOpacity onPress={() => navigation.navigate('tasks')}>
                 <RightArrow width={30} height={30} />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <View style={{gap: 10, marginTop: 10}}>
-              {todaysTasks && todaysTasks.length > 0 ? (
+              {!LoadingTodaysTasks && todaysTasks && todaysTasks.length > 0 ? (
                 todaysTasks.map((task, index) => {
                   return (
                     <View style={styles.todaysTasksCard} key={index}>

@@ -47,6 +47,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useRoute} from '@react-navigation/native';
 import colors from '../../utils/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useSelector} from 'react-redux';
 const RegisterTwo = props => {
   const [image, setImage] = useState(null);
   const [username, setUsername] = useState('');
@@ -60,6 +61,7 @@ const RegisterTwo = props => {
   const [Interests, setInterests] = useState([]);
   const route = useRoute();
   const {name, email, password} = route.params;
+  const deviceToken = useSelector(state => state.socket.deviceToken);
 
   let screenWidth;
   let screenHeight;
@@ -177,6 +179,7 @@ const RegisterTwo = props => {
       body.append('name', name);
       body.append('email', email);
       body.append('password', password);
+      body.append('fcm_token', deviceToken);
       body.append('username', validusername);
       body.append('bio', validbio);
       body.append('targetTasks', validtasks);
@@ -195,7 +198,7 @@ const RegisterTwo = props => {
         console.log('request sent');
 
         const response = await axios.post(
-          'https://deardiary-backend.onrender.com/api/v1/auth/register',
+          'https://tame-rose-monkey-suit.cyclic.app/api/v1/auth/register',
 
           body,
           {
@@ -317,7 +320,7 @@ const RegisterTwo = props => {
                     fontWeight: 800,
                     padding: 10,
                   }}>
-                  Hey {name}..! 🙌
+                  🚩 Ram Ram 🚩 {name} !
                 </Text>
                 <View>
                   <TextInput
