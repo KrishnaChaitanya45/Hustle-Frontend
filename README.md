@@ -209,8 +209,12 @@ Let's begin our exploration of the app by starting with user authentication. We'
 
 #### Tech Stacks
 
-React Native, Firebase, MongoDB, Node JS, Express JS, Cloudinary, Socket.io, Redis.
+React Native, Firebase, MongoDB, Node JS, Express JS, Cloudinary, Socket.io, Redis, TypeScript.
 
 
+#### Pending Features
+
+* Screen for the leaderboard where users can compete with their friends ⚠️ ( Backend Implemented )
+* Payments: -  Add Screens for different plans and implement payments.
 
 
