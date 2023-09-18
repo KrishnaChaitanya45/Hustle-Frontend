@@ -64,3 +64,18 @@ Let's begin our exploration of the app by starting with user authentication. We'
 | :---------------- | :------------------: | -------------------: |
 | <img src="https://drive.google.com/uc?export=view&id=1fYjjMIScGJzLs3Z1P_jOfPo7-vmTRUFW" width="200" height="400" />     |   <img src="https://drive.google.com/uc?export=view&id=1fYmLAHO8Ngj_NO2C_cOPoDO7E6DW1rUK" width="200" height="400" />    | <img src="https://drive.google.com/uc?export=view&id=1fhNNTaxAaanH4a1LCWJdhyRkAz9cHboo" width="200" height="400" />  |
 
+
+### Home Screen
+
+| Home Screen 1 | Home Screen 2 |
+| :---------------- | :------------------: |
+| <img src="https://drive.google.com/uc?export=view&id=1gSpUSqTEn_H-npVPjfY8AswJoU_56KGG" width="300" height="600" />     |   <img src="https://drive.google.com/uc?export=view&id=1gVRMNKMs-2xojfwEk-gAoh7yh5sJx_fk" width="300" height="600" />    |
+
+* The Home Screen contains 3 sections
+   * The first section displays recently completed tasks along with their progress percentages in a progress bar.
+   * The second section lists habits sorted by time. For instance, if you've added a habit for 9 AM, the app will prioritize showing upcoming habits followed by others.
+   * The third section features tasks scheduled for the day, arranged by their designated times, as explained earlier.
+ 
+
+### Tasks
+
