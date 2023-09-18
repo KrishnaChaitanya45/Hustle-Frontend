@@ -96,3 +96,27 @@ Let's begin our exploration of the app by starting with user authentication. We'
 | Task Home - 1 | Task Home - 2 | Task Home - 3 | Task Home - 4 |
 | :---------------- | :------------------: | :------------------: | -------------------: |
 | <img src="./assets/Screens/Tasks-Home-1.jpg" width="200" height="400" />     |  <img src="./assets/Screens/Tasks-Home-2.jpg" width="200" height="400" />     |  <img src="./assets/Screens/Tasks-Home-3.jpg"  width="200" height="400" />    |  <img src="./assets/Screens/Tasks-Home-4.jpg"  width="200" height="400" />    |
+
+* Tasks on the tasks homepage can be sorted based on date, category, and task status.
+* When sorting by date, tasks related to today are prioritized, and the default sorting is based on the date.
+* Categories are sorted alphabetically.
+* When sorting based on task status, working and pending tasks are listed first, followed by expired and completed tasks.
+
+### Main Tasks
+| Main Task 1 | Main Task 2 |
+| :---------------- | :------------------: |
+| <img src="./assets/Screens/Main-Task-1.jpg" width="300" height="600" />     |   <img src="./assets/Screens/Main-Task-2.jpg" width="300" height="600" />    |
+
+* The tasks are referred to as "main tasks," and these main tasks can be further divided into sub-tasks.
+* For example, if "Learning JavaScript" is your task, you can break it down into sub-tasks, which may include different concepts like Arrays & Objects, Closures, etc.
+* Subtasks can have different start and end times within the main task's start and end times.
+* Each Main Task should contain at least one sub-task.
+* The progress of the main task is evaluated based on the completion of its sub-tasks.
+* Based on the analysis of the task's start and end times and its progress, you will be rewarded with "Fire Tokens."
+* A Fire Token is an in-app currency that can be used to unlock premium features in the app.
+
+### Sub Tasks
+
+| Sub Task - 1 | Timer - 1 | Sub Task - 2 |
+| :---------------- | :------------------: | -------------------: |
+| <img src="./assets/Screens/Sub-Task-1.jpg" width="200" height="400" />     |  <img src="./assets/Screens/Timer-1.jpg" width="200" height="400" />     |  <img src="./assets/Screens/Sub-Task-3.jpg"  width="200" height="400" />    |
