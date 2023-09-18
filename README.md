@@ -75,7 +75,10 @@ Let's begin our exploration of the app by starting with user authentication. We'
    * The first section displays recently completed tasks along with their progress percentages in a progress bar.
    * The second section lists habits sorted by time. For instance, if you've added a habit for 9 AM, the app will prioritize showing upcoming habits followed by others.
    * The third section features tasks scheduled for the day, arranged by their designated times, as explained earlier.
+     
  
+### User Profile
 
-### Tasks
-
+| User Profile | Edit Profile |
+| :---------------- | :------------------: |
+| <img src="https://drive.google.com/uc?export=view&id=1glGiCISj0iSIvHuFDzFG5QqXipMqgvR_" width="300" height="600" />     |   <img src="https://drive.google.com/uc?export=view&id=1gm3ks2dDmlxgYBhnW2t4tywjN64Q46CQ" width="300" height="600" />    |
