@@ -59,5 +59,8 @@ Let's begin our exploration of the app by starting with user authentication. We'
 
 ### Authentication
 
-#### Login
-    
+
+| Login              | Register | Create Profile |
+| :---------------- | :------------------: | -------------------: |
+| <img src="https://drive.google.com/uc?export=view&id=1fYjjMIScGJzLs3Z1P_jOfPo7-vmTRUFW" width="200" height="400" />     |   <img src="https://drive.google.com/uc?export=view&id=1fYmLAHO8Ngj_NO2C_cOPoDO7E6DW1rUK" width="200" height="400" />    | <img src="https://drive.google.com/uc?export=view&id=1fhNNTaxAaanH4a1LCWJdhyRkAz9cHboo" width="200" height="400" />  |
+
