@@ -60,16 +60,16 @@ Let's begin our exploration of the app by starting with user authentication. We'
 ### Authentication
 
 
-| Login              | Register | Create Profile |
-| :---------------- | :------------------: | -------------------: |
-| <img src="https://drive.google.com/uc?export=view&id=1fYjjMIScGJzLs3Z1P_jOfPo7-vmTRUFW" width="200" height="400" />     |   <img src="https://drive.google.com/uc?export=view&id=1fYmLAHO8Ngj_NO2C_cOPoDO7E6DW1rUK" width="200" height="400" />    | <img src="https://drive.google.com/uc?export=view&id=1fhNNTaxAaanH4a1LCWJdhyRkAz9cHboo" width="200" height="400" />  |
+| Login              | Register | Create Profile | Create Profile - 2
+| :---------------- | :------------------: |:------------------: | -------------------: |
+| <img src="./assets/Screens/Login.jpg" width="200" height="400" />     |   <img src="./assets/Screens/Register.jpg" width="200" height="400" />    | <img src="./assets/Screens/Create-Profile.jpg" width="200" height="400" />  |<img src="./assets/Screens/Create-Profile-2.jpg" width="200" height="400" />  |
 
 
 ### Home Screen
 
 | Home Screen 1 | Home Screen 2 |
 | :---------------- | :------------------: |
-| <img src="https://drive.google.com/uc?export=view&id=1gSpUSqTEn_H-npVPjfY8AswJoU_56KGG" width="300" height="600" />     |   <img src="https://drive.google.com/uc?export=view&id=1gVRMNKMs-2xojfwEk-gAoh7yh5sJx_fk" width="300" height="600" />    |
+| <img src="./assets/Screens/Home-Screen-1.jpg" width="300" height="600" />     |   <img src="./assets/Screens/Home-Screen-2.jpg" width="300" height="600" />    |
 
 * The Home Screen contains 3 sections
    * The first section displays recently completed tasks along with their progress percentages in a progress bar.
@@ -81,18 +81,18 @@ Let's begin our exploration of the app by starting with user authentication. We'
 
 | User Profile | Edit Profile |
 | :---------------- | :------------------: |
-| <img src="https://drive.google.com/uc?export=view&id=1glGiCISj0iSIvHuFDzFG5QqXipMqgvR_" width="300" height="600" />     |   <img src="https://drive.google.com/uc?export=view&id=1gm3ks2dDmlxgYBhnW2t4tywjN64Q46CQ" width="300" height="600" />    |
+| <img src="./assets/Screens/User-Profile.jpg" width="300" height="600" />     |   <img src="./assets/Screens/Edit-Profile-1.jpg" width="300" height="600" />    |
 
 
 ### Create & Edit Tasks
 
 | Create Task 1 | Create Task 2 | Edit Task
 | :---------------- | :------------------: | -------------------: |
-| <img src="https://drive.google.com/uc?export=view&id=1gnQLVLepN3SI3Fb-Q28bsSeLxs4QsIxl" width="200" height="400" />     |  <img src="https://drive.google.com/uc?export=view&id=1gtaQ6D7h23dqGlcQsYs_pLG3FCFHGZA3" width="200" height="400" />     |  <img src="https://drive.google.com/uc?export=view&id=1gvC2EwF-ZWzLlYYdPydcGoGlNmnZYSEC" width="200" height="400" />    |
+| <img src="./assets/Screens/Create-Task-1.jpg" width="200" height="400" />     |  <img src="./assets/Screens/Create-Task-2.jpg" width="200" height="400" />     |  <img src="./assets/Screens/Edit-Task.jpg" width="200" height="400" />    |
 
 
 ### Task Home Page
 
 | Task Home - 1 | Task Home - 2 | Task Home - 3 | Task Home - 4 |
 | :---------------- | :------------------: | :------------------: | -------------------: |
-| <img src="https://drive.google.com/uc?export=view&id=1gwLdNGhFhXrBU6xaWwKTxmpOexCDUEuq" width="200" height="400" />     |  <img src="https://drive.google.com/uc?export=view&id=1gxyGxNC0ede15FJZgQLv9SlzclhB_uRU" width="200" height="400" />     |  <img src="https://drive.google.com/uc?export=view&id=1gy0AdqXcRdFsm_5minTyBogV88ZEUM1r" width="200" height="400" />    |  <img src="https://drive.google.com/uc?export=view&id=1gzFv1tyKoWFFTcaJ2QhXkbrLmtFTMFI6" width="200" height="400" />    |
+| <img src="./assets/Screens/Tasks-Home-1.jpg" width="200" height="400" />     |  <img src="./assets/Screens/Tasks-Home-2.jpg" width="200" height="400" />     |  <img src="./assets/Screens/Tasks-Home-3.jpg"  width="200" height="400" />    |  <img src="./assets/Screens/Tasks-Home-4.jpg"  width="200" height="400" />    |
